@@ -263,7 +263,7 @@ class EvaluationHistoryMixin(object):
                     "appearance": "standard",
                 },
                 "expression_properties": {
-                    "template_options.description": cls.recent_iq_score_desc
+                    "template_options.placeholder": cls.recent_iq_score_desc
                 },
                 "hide_expression": "!(model.has_iq_test)",
             },
