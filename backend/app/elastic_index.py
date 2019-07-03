@@ -2,6 +2,7 @@ from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tok
 import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
+from app.model.search import Facets
 
 autocomplete = analyzer('autocomplete',
                         tokenizer=tokenizer('ngram', 'edge_ngram', min_gram=2, max_gram=15,
@@ -172,7 +173,6 @@ class ElasticIndex:
         document_search = document_search[search.start:search.start + search.size]
         return document_search.execute()
 
-
 class DocumentSearch(elasticsearch_dsl.FacetedSearch):
     def __init__(self, *args, **kwargs):
         self.index = kwargs["index"]
@@ -182,19 +182,14 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
         # self.sort = kwargs["sort"]
         # kwargs.pop("sort")
 
+        for name, member in Facets.__members__.items():
+            self.facets[member.value] = elasticsearch_dsl.TermsFacet(field=name)
+
         super(DocumentSearch, self).__init__(*args, **kwargs)
 
     doc_types = [StarDocument]
     fields = ['title^10', 'content^5', 'description^5', 'location^3', 'category^2', 'child_category^2', 'organization', 'website']
-
-    facets = {
-        'Location': elasticsearch_dsl.TermsFacet(field='location'),
-        'Type': elasticsearch_dsl.TermsFacet(field='label'),
-        'Life Ages': elasticsearch_dsl.TermsFacet(field='life_age'),
-        'Category': elasticsearch_dsl.TermsFacet(field='category'),
-        'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
-        'Status': elasticsearch_dsl.TermsFacet(field='status')
-    }
+    facets = {}
 
     def highlight(self, search):
         return search.highlight('content', fragment_size=50)

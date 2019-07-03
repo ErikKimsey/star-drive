@@ -1,4 +1,4 @@
-import datetime
+import enum
 
 
 class Search:
@@ -25,6 +25,22 @@ class Search:
 
         return jfilter
 
+
+class Facets(enum.Enum):
+    label = 'Type'
+    location = 'Location'
+    category = 'Topic'
+    life_age = 'Age Range'
+    organization = 'Organization'
+    status = 'Status'
+
+    @classmethod
+    def has_name(cls, name):
+        return any(name == item.name for item in cls)
+
+    @classmethod
+    def options(cls):
+        return [item.name for item in cls]
 
 class Facet:
     field = ""

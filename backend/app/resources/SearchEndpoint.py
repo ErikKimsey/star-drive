@@ -1,10 +1,9 @@
 import elasticsearch
 import flask_restful
 from flask import request, json
-import logging
 
 from app import elastic_index, RestException
-from app.model.search import Facet, FacetCount, Hit
+from app.model.search import Facets, Facet, FacetCount, Hit
 from app.resources.schema import SearchSchema
 
 
@@ -22,14 +21,14 @@ class SearchEndpoint(flask_restful.Resource):
 
         search.total = results.hits.total
         search.facets = []
-        for facet_name in results.facets:
-            facet = Facet(facet_name)
-            facet.facetCounts = []
-            for category, hit_count, is_selected in results.facets[
-                    facet_name]:
-                facet.facetCounts.append(
-                    FacetCount(category, hit_count, is_selected))
-            search.facets.append(facet)
+
+        for name, member in Facets.__members__.items():
+            if member.value in results.facets:
+                facet = Facet(member.value)
+                facet.facetCounts = []
+                for category, hit_count, is_selected in results.facets[member.value]:
+                    facet.facetCounts.append(FacetCount(category, hit_count, is_selected))
+                search.facets.append(facet)
 
         search.hits = []
         for hit in results:
