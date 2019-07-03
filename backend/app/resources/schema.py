@@ -91,6 +91,7 @@ class CategorySchema(ModelSchema):
     parent_id = fields.Integer(required=False, allow_none=True)
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
     parent = fields.Nested(ParentCategorySchema, dump_only=True)
+    hide_in_search = fields.Boolean(required=False, allow_none=True)
     level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
     event_count = fields.Method('get_event_count')
     location_count = fields.Method('get_location_count')

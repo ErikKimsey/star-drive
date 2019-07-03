@@ -124,10 +124,10 @@ class BaseTest:
         return db_category
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           phone="555-555-5555", website="http://stardrive.org"):
+                           phone="555-555-5555", website="http://stardrive.org", organization_id=None, categories=[]):
 
-        resource = StarResource(title=title, description=description, phone=phone, website=website)
-        resource.organization_id = self.construct_organization().id
+        resource = StarResource(title=title, description=description, phone=phone, website=website, categories=categories)
+        resource.organization_id = self.construct_organization().id if organization_id is None else organization_id
         db.session.add(resource)
 
         db_resource = db.session.query(StarResource).filter_by(title=resource.title).first()

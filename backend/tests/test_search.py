@@ -183,6 +183,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(resource.id, search_results['hits'][0]['id'])
 
     def test_delete_search_item(self):
+        elastic_index.clear()
         rainbow_query = {'words': 'rainbows', 'filters': []}
         resource = self.construct_resource(
             title='space unicorn', description="delivering rainbows")
@@ -191,3 +192,44 @@ class TestSearch(BaseTest, unittest.TestCase):
         elastic_index.remove_document(resource, 'Resource')
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["hits"]))
+
+    def test_search_facets_display_in_order(self):
+        elastic_index.clear()
+        o_id = self.construct_organization().id
+        c1 = self.construct_category(name="c1")
+        c1_1 = self.construct_category(name="c1_1", parent=c1)
+        c1_2 = self.construct_category(name="c1_2", parent=c1)
+        c1_3 = self.construct_category(name="c1_3", parent=c1)
+        c2 = self.construct_category(name="c2")
+        c2_1 = self.construct_category(name="c2_1", parent=c2)
+        c2_2 = self.construct_category(name="c2_2", parent=c2)
+        c2_3 = self.construct_category(name="c2_3", parent=c2)
+        c3 = self.construct_category(name="c3")
+        c3_1 = self.construct_category(name="c3_1", parent=c3)
+        c3_2 = self.construct_category(name="c3_2", parent=c3)
+        c3_3 = self.construct_category(name="c3_3", parent=c3)
+
+        r1 = self.construct_resource(title='t1', description='d1', organization_id=o_id, categories=[c1_1, c2_1, c3_1])
+        r2 = self.construct_resource(title='t2', description='d2', organization_id=o_id, categories=[c1_2, c2_2, c3_2])
+        r3 = self.construct_resource(title='t3', description='d3', organization_id=o_id, categories=[c1_3, c2_3, c3_3])
+        r4 = self.construct_resource(title='t4', description='d4', organization_id=o_id, categories=[c1_1, c2_2, c3_2])
+        r5 = self.construct_resource(title='t5', description='d5', organization_id=o_id, categories=[c1_2, c2_3, c3_3])
+        r6 = self.construct_resource(title='t6', description='d6', organization_id=o_id, categories=[c1_3, c2_1, c3_1])
+        r7 = self.construct_resource(title='t7', description='d7', organization_id=o_id, categories=[c1_1, c2_3, c3_3])
+        r8 = self.construct_resource(title='t8', description='d8', organization_id=o_id, categories=[c1_2, c2_1, c3_2])
+        r9 = self.construct_resource(title='t9', description='d9', organization_id=o_id, categories=[c1_3, c2_2, c3_1])
+
+        search_results = self.search({'facets': {'c1': 'c1_1'}})
+        self.assertEqual(3, len(search_results["hits"]))
+
+    def test_search_resource_parent_category(self):
+        # If a resource is categorized in a subcategory,
+        # it should be returned when the parent category is selected
+        elastic_index.clear()
+        o_id = self.construct_organization().id
+        c1 = self.construct_category(name="c1")
+        c1_1 = self.construct_category(name="c1_1", parent=c1)
+        c1_1_1 = self.construct_category(name="c1_1_1", parent=c1_1)
+        r1 = self.construct_resource(title='t1', description='d1', organization_id=o_id, categories=[c1_1_1])
+        search_results = self.search({'facets': {'c1': 'c1_1'}})
+        self.assertEqual(1, len(search_results["hits"]))

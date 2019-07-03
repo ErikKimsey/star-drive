@@ -26,7 +26,7 @@ class StarDocument(Document):
     organization = Keyword()
     website = Keyword()
     location = Keyword()
-    life_age = Keyword()
+    age_range = Keyword()
     status = Keyword()
     category = Keyword(multi=True)
     child_category = Keyword(multi=True)
@@ -108,7 +108,7 @@ class ElasticIndex:
                            content=document.indexable_content(),
                            description=document.description,
                            location=None,
-                           life_age=None,
+                           age_range=None,
                            status=None,
                            category=[],
                            child_category=[],
@@ -132,8 +132,8 @@ class ElasticIndex:
                 if cat.category.parent.name in ['Locations', 'Virginia', 'West Virginia']:
                     doc.location = cat.category.name
                     doc.child_category.append(cat.category.name)
-                elif cat.category.parent.name == 'Life Ages':
-                    doc.life_age = cat.category.name
+                elif cat.category.parent.name == Facets.age_range:
+                    doc.age_range = cat.category.name
                     doc.child_category.append(cat.category.name)
                 elif cat.category.parent.name == 'Type of Resources':
                     doc.child_category.append(cat.category.name)

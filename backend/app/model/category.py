@@ -11,6 +11,7 @@ class Category(db.Model):
                                lazy="joined",
                                join_depth=2,
                                order_by="Category.name")
+    hide_in_search = db.Column(db.Boolean)
 
     def calculate_level(self):
         """Provide the depth of the category """

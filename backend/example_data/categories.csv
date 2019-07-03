@@ -1,94 +1,96 @@
-Assessment and Diagnosis,
-     Pediatrics ,Assessment and Diagnosis
-     Psychological Testing ,Assessment and Diagnosis
-     New to Diagnosis ,Assessment and Diagnosis
-Treatment and Therapies ,
-    Medication,Treatment and Therapies 
-    Early Intervention,Treatment and Therapies 
-    Applied Behavior Analysis,Treatment and Therapies 
-    Speech and Communication Supports,Treatment and Therapies 
-    Occupational Therapy ,Treatment and Therapies 
-    Counseling,Treatment and Therapies 
-          Cognitive Behavioral Therapy ,    Counseling
-          Dialectical Behavior Therapy,    Counseling
-    Social Skills Training,Treatment and Therapies 
-Physical and Mental Health ,
-     Wellness,Physical and Mental Health 
-              Dental Care,     Wellness
-              Sleep ,     Wellness
-              Toilet Training ,     Wellness
-              Gastrointestinal (GI) issues ,     Wellness
-              Feeding issues,     Wellness
-              Blood Testing ,     Wellness
-    Executive Functioning ,Physical and Mental Health 
-    Challenging Behaviors,Physical and Mental Health 
-    Developmental Delays,Physical and Mental Health 
-    Mental Health ,Physical and Mental Health 
-              ADHD,    Mental Health 
-    Genetic Conditions ,Physical and Mental Health 
-    Sexuality,Physical and Mental Health 
-    Puberty,Physical and Mental Health 
-Education and Technology ,
-     School,Education and Technology 
-     Support Plans,Education and Technology 
-          IEP ,     Support Plans
-     In School Supports,Education and Technology 
-     Communication  System ,Education and Technology 
-          Verbal,     Communication  System 
-          Non-Verbal (visual aids),     Communication  System 
-Adulthood and Transition,
-      Post Secondary Education ,Adulthood and Transition
-      Employment ,Adulthood and Transition
-      Adult Programs ,Adulthood and Transition
-             Residential Program,      Adult Programs 
-             Adult Day Program,      Adult Programs 
-Familiy Supports and Parent Training ,
-      Parent Training ,Familiy Supports and Parent Training 
-      Support Groups,Familiy Supports and Parent Training 
-      Respite ,Familiy Supports and Parent Training 
-      Autism-friendly Events,Familiy Supports and Parent Training 
-      Recreation & Camps,Familiy Supports and Parent Training 
-      Family Relationship ,Familiy Supports and Parent Training 
-              Siblings ,      Family Relationship 
-Financial Assistance and Advocacy,
-      Medicaid ,Financial Assistance and Advocacy
-            Accepts Medicaid ,      Medicaid 
-            Obtaining a Waiver,      Medicaid 
-      Advocacy,Financial Assistance and Advocacy
-            Self-Advocacy ,      Advocacy
-            Parent-Advocacy ,      Advocacy
-Locations,
-    Virginia,Locations
-         Winchester/Front Royal ,    Virginia
-         Northern Virginia,    Virginia
-         Fredericksburg and Northern Neck         ,    Virginia
-         Culpeper/Madison ,    Virginia
-         Harrisonburg ,    Virginia
-         Waynesboro/Staunton/Lexington ,    Virginia
-         Charlottesville ,    Virginia
-         Richmond ,    Virginia
-         Hampton Roads ,    Virginia
-         Lynchburg ,    Virginia
-         Roanoke/New River Valley,    Virginia
-         Southside Virginia,    Virginia
-         Southwest Virginia ,    Virginia
-West Virginia,Locations
-     Eastern Panhandle (Martinsburg/Charles Town),West Virginia
-     Fairmont/Morgantown,West Virginia
-     Northern Panhandle (Wheeling) ,West Virginia
-     Huntington,West Virginia
-     Charleston,West Virginia
-     Lewisburg/White Sulphur Springs,West Virginia
-National ,Locations
-Type of Resources ,
-Handout ,Type of Resources 
-Book ,Type of Resources 
-Event,Type of Resources 
-Life Ages,
-Pre-K (0 - 5 years),Life Ages
-Childhood (0 - 13 years),Life Ages
-School age (6 - 13 years),Life Ages
-Transition age (14 - 22 years),Life Ages
-Adulthood (23 - 64),Life Ages
-Aging (65+),Life Ages
-All Ages,Life Ages
+level_1,level_2,level_3,level_4,parent_name,hide_in_search
+Topic,,,,,
+,Assessment and Diagnosis,,,Topic,
+,,Pediatrics,,Assessment and Diagnosis,
+,,Psychological Testing,,Assessment and Diagnosis,
+,,New to Diagnosis,,Assessment and Diagnosis,
+,Treatment and Therapies,,,Topic,
+,,Medication,,Treatment and Therapies,
+,,Early Intervention,,Treatment and Therapies,
+,,Applied Behavior Analysis,,Treatment and Therapies,
+,,Speech and Communication Supports,,Treatment and Therapies,
+,,Occupational Therapy,,Treatment and Therapies,
+,,Counseling,,Treatment and Therapies,
+,,,Cognitive Behavioral Therapy,Counseling,
+,,,Dialectical Behavior Therapy,Counseling,
+,,Social Skills Training,,Treatment and Therapies,
+,Physical and Mental Health,,,Topic,
+,,Wellness,,Physical and Mental Health,
+,,,Dental Care,Wellness,
+,,,Sleep,Wellness,
+,,,Toilet Training,Wellness,
+,,,Gastrointestinal (GI) issues,Wellness,
+,,,Feeding issues,Wellness,
+,,,Blood Testing,Wellness,
+,,Executive Functioning,,Physical and Mental Health,
+,,Challenging Behaviors,,Physical and Mental Health,
+,,Developmental Delays,,Physical and Mental Health,
+,,Mental Health,,Physical and Mental Health,
+,,,ADHD,Mental Health,
+,,Genetic Conditions,,Physical and Mental Health,
+,,Sexuality,,Physical and Mental Health,
+,,Puberty,,Physical and Mental Health,
+,Education and Technology,,,Topic,
+,,School,,Education and Technology,
+,,Support Plans,,Education and Technology,
+,,,IEP,Support Plans,
+,,In School Supports,,Education and Technology,
+,,Communication System,,Education and Technology,
+,,,Verbal,Communication System,
+,,,Non-Verbal (visual aids),Communication System,
+,Adulthood and Transition,,,Topic,
+,,Post Secondary Education,,Adulthood and Transition,
+,,Employment,,Adulthood and Transition,
+,,Adult Programs,,Adulthood and Transition,
+,,,Residential Program,Adult Programs,
+,,,Adult Day Program,Adult Programs,
+,Familiy Supports and Parent Training,,,Topic,
+,,Parent Training,,Familiy Supports and Parent Training,
+,,Support Groups,,Familiy Supports and Parent Training,
+,,Respite,,Familiy Supports and Parent Training,
+,,Autism-friendly Events,,Familiy Supports and Parent Training,
+,,Recreation & Camps,,Familiy Supports and Parent Training,
+,,Family Relationship,,Familiy Supports and Parent Training,
+,,,Siblings,Family Relationship,
+,Financial Assistance and Advocacy,,,Topic,
+,,Medicaid,,Financial Assistance and Advocacy,
+,,Accepts Medicaid,,Medicaid,
+,,Obtaining a Waiver,,Medicaid,
+,,Advocacy,,Financial Assistance and Advocacy,
+,,Self-Advocacy,,Advocacy,
+,,Parent-Advocacy,,Advocacy,
+Locations,,,,,
+,Virginia,,,Locations,TRUE
+,,Winchester/Front Royal,,Virginia,
+,,Northern Virginia,,Virginia,
+,,Fredericksburg and Northern Neck,,Virginia,
+,,Culpeper/Madison,,Virginia,
+,,Harrisonburg,,Virginia,
+,,Waynesboro/Staunton/Lexington,,Virginia,
+,,Charlottesville,,Virginia,
+,,Richmond,,Virginia,
+,,Hampton Roads,,Virginia,
+,,Lynchburg,,Virginia,
+,,Roanoke/New River Valley,,Virginia,
+,,Southside Virginia,,Virginia,
+,,Southwest Virginia,,Virginia,
+,West Virginia,,,Locations,TRUE
+,,Eastern Panhandle (Martinsburg/Charles Town),,West Virginia,
+,,Fairmont/Morgantown,,West Virginia,
+,,Northern Panhandle (Wheeling),,West Virginia,
+,,Huntington,,West Virginia,
+,,Charleston,,West Virginia,
+,,Lewisburg/White Sulphur Springs,,West Virginia,
+,National,,,Locations,TRUE
+Type of Resources,,,,,TRUE
+,Handout,,,Type of Resources,TRUE
+,Book,,,Type of Resources,TRUE
+,Event,,,Type of Resources,TRUE
+Age Range,,,,,
+,Pre-K (0 - 5 years),,,Age Range,
+,Childhood (0 - 13 years),,,Age Range,
+,School age (6 - 13 years),,,Age Range,
+,Transition age (14 - 22 years),,,Age Range,
+,Adulthood (23 - 64),,,Age Range,
+,Aging (65+),,,Age Range,
+,All Ages,,,Age Range,
