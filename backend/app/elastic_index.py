@@ -160,7 +160,7 @@ class ElasticIndex:
         for r in resources:
             self.add_document(r, flush=False)
         for e in events:
-            self.add_document(e, flush=False)
+            self.add_document(e, flush=False, latitude=e.latitude, longitude=e.longitude)
         for l in locations:
             self.add_document(l, flush=False, latitude=l.latitude, longitude=l.longitude)
         for s in studies:
