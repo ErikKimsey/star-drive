@@ -35,11 +35,12 @@ class CategoryEndpoint(flask_restful.Resource):
 
 class CategoryListEndpoint(flask_restful.Resource):
     category_schema = CategorySchema()
-    categories_schema = ParentCategorySchema(many=True)
+    categories_schema = CategorySchema(many=True)
 
     def get(self):
         categories = db.session.query(Category)\
             .options(joinedload(Category.children))\
+            .filter(Category.parent_id == None)\
             .order_by(Category.name)\
             .all()
         return self.categories_schema.dump(categories)
