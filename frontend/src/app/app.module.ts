@@ -9,6 +9,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatNativeDateModule } from '@angular/material';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatBadgeModule } from '@angular/material';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -31,6 +32,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTreeModule } from '@angular/material/tree';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormlyModule } from '@ngx-formly/core';
@@ -92,6 +94,7 @@ import { StudiesComponent } from './studies/studies.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
 import { TimedoutComponent } from './timed-out/timed-out.component';
+import { TreeSelectSectionComponent } from './_forms/tree-select-section/tree-select-section.component';
 import { TypeIconComponent } from './type-icon/type-icon.component';
 import { UserAdminDetailsComponent } from './user-admin-details/user-admin-details.component';
 import { UserAdminComponent } from './user-admin/user-admin.component';
@@ -104,6 +107,11 @@ export class FormlyConfig {
       {
         name: 'autocomplete',
         component: AutocompleteSectionComponent,
+        wrappers: ['form-field'],
+      },
+      {
+        name: 'tree-select',
+        component: TreeSelectSectionComponent,
         wrappers: ['form-field'],
       }
     ],
@@ -177,6 +185,7 @@ export class FormlyConfig {
     StudyDetailComponent,
     TermsComponent,
     TimedoutComponent,
+    TreeSelectSectionComponent,
     TypeIconComponent,
     UserAdminComponent,
     UserAdminDetailsComponent,
@@ -196,6 +205,7 @@ export class FormlyConfig {
     HttpClientModule,
     MarkdownModule.forRoot(),
     MatAutocompleteModule,
+    MatBadgeModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
@@ -219,6 +229,7 @@ export class FormlyConfig {
     MatTableModule,
     MatToolbarModule,
     MatTooltipModule,
+    MatTreeModule,
     NgProgressModule,
     PdfJsViewerModule,
     ReactiveFormsModule,

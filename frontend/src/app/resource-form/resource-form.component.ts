@@ -5,6 +5,8 @@ import { Resource } from '../_models/resource';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { FormGroup } from '@angular/forms';
 import { Organization } from '../_models/organization';
+import { Category } from '../_models/category';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
 
 
 enum PageState {
@@ -23,6 +25,8 @@ export class ResourceFormComponent implements OnInit {
   pageState = PageState;
   state = PageState.LOADING;
   showConfirmDelete = false;
+
+  dataSource = new MatTreeNestedDataSource<Category>();
 
   model: any = {};
   updatedModel: any = {};
@@ -188,12 +192,10 @@ export class ResourceFormComponent implements OnInit {
       },
       {
         key: 'categories',
-        type: 'multicheckbox',
+        type: 'tree-select',
         templateOptions: {
           label: 'Topics',
-          options: this.api.getCategories(),
-          valueProp: 'id',
-          labelProp: 'name',
+          dataSource: this.dataSource,
         },
         hideExpression: '!model.type',
       },
@@ -210,6 +212,7 @@ export class ResourceFormComponent implements OnInit {
     private router: Router
   ) {
     this.getOrganizations();
+    this.getCategories();
   }
 
   ngOnInit() {
@@ -220,6 +223,13 @@ export class ResourceFormComponent implements OnInit {
   getOrganizations() {
     this.api.getOrganizations().subscribe( orgs => {
        return this.orgOptions = orgs;
+      }
+    )
+  }
+
+  getCategories() {
+    this.api.getCategories().subscribe( cats => {
+        return this.dataSource.data = cats;
       }
     )
   }
