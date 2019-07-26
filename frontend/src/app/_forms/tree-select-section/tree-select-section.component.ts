@@ -17,8 +17,6 @@ export class TreeSelectSectionComponent extends FieldType implements OnInit {
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
 
-  getLevel = (node: Category) => node.level;
-
   ngOnInit() {
   }
 
@@ -86,22 +84,7 @@ export class TreeSelectSectionComponent extends FieldType implements OnInit {
 
   /* Get the parent node of a node */
   getParentNode(node: Category): Category | null {
-    const currentLevel = this.getLevel(node);
-
-    if (currentLevel < 1) {
-      return null;
-    }
-
-    const startIndex = this.treeControl.dataNodes.indexOf(node) - 1;
-
-    for (let i = startIndex; i >= 0; i--) {
-      const currentNode = this.treeControl.dataNodes[i];
-
-      if (this.getLevel(currentNode) < currentLevel) {
-        return currentNode;
-      }
-    }
-    return null;
+    return node.parent;
   }
 
   /** Select the category so we can insert the new item. */
