@@ -6,6 +6,7 @@ import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { FormGroup } from '@angular/forms';
 import { Organization } from '../_models/organization';
 import { Category } from '../_models/category';
+import { ResourceCategory } from '../_models/resource_category';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 
 
@@ -27,6 +28,7 @@ export class ResourceFormComponent implements OnInit {
   showConfirmDelete = false;
 
   dataSource = new MatTreeNestedDataSource<Category>();
+  startingCategories: Category[] = [];
 
   model: any = {};
   updatedModel: any = {};
@@ -196,6 +198,7 @@ export class ResourceFormComponent implements OnInit {
         templateOptions: {
           label: 'Topics',
           dataSource: this.dataSource,
+          startingCategories: this.startingCategories,
         },
         hideExpression: '!model.type',
       },
@@ -232,6 +235,10 @@ export class ResourceFormComponent implements OnInit {
         return this.dataSource.data = cats;
       }
     )
+  }
+
+  addCategory(parent: Category = null) {
+    console.log('adding a category with a parent!', parent)
   }
 
   filterOrganizations(name: string): Organization[] {
@@ -277,7 +284,9 @@ export class ResourceFormComponent implements OnInit {
     this.model.categories = [];
     if (resource.resource_categories.length > 0) {
       for (const cat in resource.resource_categories) {
-        this.model.categories[resource.resource_categories[cat].category.id] = true;
+        // this.model.categories[resource.resource_categories[cat].category.id] = true;
+        this.model.categories.push(resource.resource_categories[cat]);
+        this.startingCategories.push(this.resource.resource_categories[cat].category);
         callback();
       }
     } else {
@@ -297,18 +306,34 @@ export class ResourceFormComponent implements OnInit {
 
   updateResourceCategories() {
     const rcIds = this.resource.resource_categories.map(rc => rc.category.id);
+    console.log('model categories at update', this.model.categories);
+    // Add the new categories
+    // console.log('converting to rc', this.convertToResourceCategories());
+    // this.api.updateResourceCategories(this.resource, this.convertToResourceCategories()).subscribe();
     // Add the new categories
     for (const cat in this.model.categories) {
-      if (!rcIds.includes(Number(cat))) {
-        this.api.addResourceCategory({resource_id: this.resource.id, category_id: Number(cat), type: this.resource.type}).subscribe();
+      console.log('i am a cat', this.model.categories[cat]);
+      if (!rcIds.includes(this.model.categories[cat].id)) {
+        this.api.addResourceCategory({resource_id: this.resource.id, category_id: this.model.categories[cat].id, type: this.resource.type}).subscribe();
       }
     }
     // Remove any deleted categories
     for (const rc in this.resource.resource_categories) {
-      if (!this.model.categories[this.resource.resource_categories[rc].category_id]) {
+      if (!this.model.categories.includes(this.resource.resource_categories[rc].category)) {
         this.api.deleteResourceCategory(this.resource.resource_categories[rc]).subscribe();
       }
     }
+  }
+
+  convertToResourceCategories() {
+    let resourceCategories = [];
+    for (const cat in this.model.categories) {
+      console.log('i am a cat', this.model.categories[cat]);
+      // let rc: ResourceCategory = new ResourceCategory({'resource_id': this.resource.id, 'category_id': this.model.categories[cat].id, 'type': this.resource.type})
+      resourceCategories.push({'resource_id': this.resource.id, 'category_id': this.model.categories[cat].id, 'type': this.resource.type})
+    }
+    console.log('resource cats', resourceCategories);
+    return resourceCategories;
   }
 
   addResourceCategories(resource_id) {
@@ -342,6 +367,8 @@ export class ResourceFormComponent implements OnInit {
   submit() {
     // Post to the resource endpoint, and then close
     this.updateOrganization();
+    console.log('model at submit', this.model);
+    console.log('updated model at submit', this.updatedModel);
     if (this.form.valid) {
       if (this.createNew) {
         if (this.model.type == 'resource') {

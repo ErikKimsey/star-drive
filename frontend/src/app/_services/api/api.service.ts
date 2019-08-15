@@ -295,6 +295,13 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** updateResourceCategories */
+  updateResourceCategories(resource: Resource, categories: ResourceCategory[]): Observable<ResourceCategory[]> {
+    console.log('posting now', categories);
+    return this.httpClient.post<any>(this._endpointUrl('categorybyresource').replace('<id>', resource.id.toString()), categories)
+      .pipe(catchError(this._handleError));
+  }
+
   /** Add ResourceCategory */
   addResourceCategory(resourceCategory: ResourceCategory): Observable<ResourceCategory> {
     return this.httpClient.post<ResourceCategory>(this._endpointUrl('resourcecategorylist'), resourceCategory)

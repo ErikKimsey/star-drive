@@ -26,6 +26,7 @@ export class Resource extends GeoLocation {
   status?: string;
   resource_categories?: ResourceCategory[];
   categories?: Category[];
+  _links: any;
 
   constructor(private _props) {
     super(_props);

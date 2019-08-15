@@ -12,12 +12,16 @@ import { Category } from '../../_models/category';
 export class TreeSelectSectionComponent extends FieldType implements OnInit {
   treeControl = new NestedTreeControl<Category>(node => node.children);
 
-  nodes = {};
+  hasNoContent = (_: number, _nodeData: Category) => _nodeData.name === '';
 
   /** The selection for checklist */
-  checklistSelection = new SelectionModel<Category>(true /* multiple */);
+  categories = new SelectionModel<Category>(true /* multiple */);
 
   ngOnInit() {
+    for (let cat in this.to.startingCategories) {
+      this.categories.isSelected(this.to.startingCategories[cat]);
+    }
+    console.log('categories after single select?', this.categories);
   }
 
   hasNestedChild = (_: number, node: Category) => {
@@ -27,35 +31,70 @@ export class TreeSelectSectionComponent extends FieldType implements OnInit {
   /** Whether all the descendants of the node are selected */
   descendantsAllSelected(node: Category): boolean {
     const descendants = this.treeControl.getDescendants(node);
-    return descendants.every(child => this.checklistSelection.isSelected(child));
+    return descendants.every(child => this.categories.isSelected(child));
   }
 
   /** Whether part of the descendants are selected */
   descendantsPartiallySelected(node: Category): boolean {
     const descendants = this.treeControl.getDescendants(node);
-    const result = descendants.some(child => this.checklistSelection.isSelected(child));
+    const result = descendants.some(child => this.categories.isSelected(child));
     return result && !this.descendantsAllSelected(node);
   }
 
   numSelectedDescendants(node: Category): number {
     const descendants: Category[] = this.treeControl.getDescendants(node);
-    const selectedDescendants = descendants.filter(d => this.checklistSelection.isSelected(d));
+    const selectedDescendants = descendants.filter(d => this.categories.isSelected(d));
     return selectedDescendants.length;
   }
 
   /** Toggle the item selection. Select/deselect all the descendants node */
-  toggleNode(node: Category): void {
-    this.checklistSelection.toggle(node);
+  toggleNode(node: Category, checked: boolean): void {
+    this.categories.toggle(node);
     const descendants = this.treeControl.getDescendants(node);
-    this.checklistSelection.isSelected(node)
-      ? this.checklistSelection.select(...descendants)
-      : this.checklistSelection.deselect(...descendants);
+    this.categories.isSelected(node)
+      ? this.categories.select(...descendants)
+      : this.categories.deselect(...descendants);
 
     // Force update for the parent
     descendants.every(child =>
-      this.checklistSelection.isSelected(child)
+      this.categories.isSelected(child)
     );
     this.checkAllParentsSelection(node);
+    console.log('categories in toggle', this.categories.selected);
+    // if (this.to.type === 'tree-select') {
+    //   console.log('i am an array');
+    console.log('tree control', this.treeControl);
+    for (let cat in this.to.dataSource) {
+      console.log('this is the form control value', this.to.dataSource[cat]);
+      this.formControl.patchValue(this.to.dataSource[cat] in this.categories.selected
+        ? [...(this.formControl.value || []), node]
+        : [...(this.formControl.value || [])].filter(o => o !== node),
+      );
+    }
+
+    // for (let cat in this.categories.selected) {
+    //   // console.log('this is the cat in the form control set', this.categories.selected[cat]);
+    //   this.formControl.patchValue((this.formControl.value || []), this.categories.selected[cat]);
+    // }
+
+
+      // this.formControl.patchValue(checked
+      //   ? [...(this.formControl.value || []), node]
+      //   : [...(this.formControl.value || [])].filter(o => o !== node),
+      // );
+      // for (const child in node.children) {
+      //   console.log('here is the child', child);
+      //   this.formControl.patchValue(checked
+      //   ? [...(this.formControl.value || []), node.children[child]]
+      //   : [...(this.formControl.value || [])].filter(o => o !== node.children[child]),
+      // );
+      // }
+    // } else {
+    //   console.log('i am not an array');
+    //   this.formControl.patchValue({ ...this.formControl.value, [node.name]: checked });
+    // }
+    this.formControl.markAsTouched();
+    console.log('here is the form control', this.formControl);
   }
 
 
@@ -70,15 +109,15 @@ export class TreeSelectSectionComponent extends FieldType implements OnInit {
 
     /** Check root node checked state and change it accordingly */
   checkRootNodeSelection(node: Category): void {
-    const nodeSelected = this.checklistSelection.isSelected(node);
+    const nodeSelected = this.categories.isSelected(node);
     const descendants = this.treeControl.getDescendants(node);
     const descAllSelected = descendants.every(child =>
-      this.checklistSelection.isSelected(child)
+      this.categories.isSelected(child)
     );
     if (nodeSelected && !descAllSelected) {
-      this.checklistSelection.deselect(node);
+      this.categories.deselect(node);
     } else if (!nodeSelected && descAllSelected) {
-      this.checklistSelection.select(node);
+      this.categories.select(node);
     }
   }
 
@@ -89,9 +128,7 @@ export class TreeSelectSectionComponent extends FieldType implements OnInit {
 
   /** Select the category so we can insert the new item. */
   addNewItem(node: Category) {
-    // const parentNode = this.flatNodeMap.get(node);
-    // this.database.insertItem(parentNode!, '');
+    // node.children.push({'name': '', 'parent': node, 'children': [], 'level': node.level+1});
     this.treeControl.expand(node);
   }
-
 }
