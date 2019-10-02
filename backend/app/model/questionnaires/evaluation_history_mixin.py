@@ -11,6 +11,8 @@ from app.export_service import ExportService
 class EvaluationHistoryMixin(object):
     __question_type__ = ExportService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
+    who_diagnosed_other_hide_expression = '!(model.who_diagnosed && (model.who_diagnosed === "diagnosisOther"))'
+    where_diagnosed_other_hide_expression = '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -99,6 +101,7 @@ class EvaluationHistoryMixin(object):
                 "type": "select",
                 "template_options": {
                     "label": "First Diagnosed by:",
+                    "placeholder": "Please select from these options",
                     "options": [
                         {
                             "value": "pediatrician",
@@ -129,9 +132,13 @@ class EvaluationHistoryMixin(object):
             "type": "input",
             "template_options": {
                 "label": "First diagnosed by",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.who_diagnosed && (model.who_diagnosed === "diagnosisOther"))',
+            "hide_expression": who_diagnosed_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + who_diagnosed_other_hide_expression
+            }
         },
     )
 
@@ -144,6 +151,7 @@ class EvaluationHistoryMixin(object):
                 "type": "select",
                 "template_options": {
                     "label": "Diagnosed At",
+                    "placeholder": "Please select from these options",
                     "options": [
                         {"value": "1uvaDp", "label": "UVA Developmental Pediatrics or UVA Child Development and Rehabilitation Center (formerly Kluge Children's Rehabilitation Center, KCRC)"},
                         {"value": "2sjcCse", "label": "Sheila Johnson Center or Curry School of Education"},
@@ -187,10 +195,14 @@ class EvaluationHistoryMixin(object):
             "display_order": 7,
             "type": "input",
             "template_options": {
-                "label": "Where diagnosed?",
-                "appearance": "standard"
+                "label": "Where was this diagnosis made?",
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))',
+            "hide_expression": where_diagnosed_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + where_diagnosed_other_hide_expression
+            }
         },
     )
 
@@ -268,10 +280,11 @@ class EvaluationHistoryMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "IQ Score",
+                    "placeholder": "Please enter the number of the most recent score, if known. Otherwise, leave this field blank.",
+                    "type": "number",
+                    "max": 200,
+                    "min": 0,
                     "appearance": "standard",
-                },
-                "expression_properties": {
-                    "template_options.description": cls.recent_iq_score_desc
                 },
                 "hide_expression": "!(model.has_iq_test)",
             },

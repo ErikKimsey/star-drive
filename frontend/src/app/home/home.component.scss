@@ -1,39 +1,24 @@
-// Import theming functions
-@import '../../../node_modules/@angular/material/theming';
-// Import your custom theme
-@import '../../stardrive_material';
-// Load the STAR DRIVE Theme
-@include stardrive-theme($stardrive-theme);
+@import '../../config';
 
-p.intro {
-  padding: 0 20px 0 20px;
-}
+#hero {
+  background-image: url('/assets/home/hero-family.jpg');
+  padding-top: 80px;
+  padding-bottom: 80px;
 
-.action {
-  padding: 2em;
+  .hero-content {
+    text-align: center;
 
-  button {
-    margin: 1em;
+    hr {
+      border-top-width: 4px;
+      margin-top: 1em;
+      margin-bottom: 1em;
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 }
 
-.news {
-  mat-card {
-    margin: 1em;
-    color: white;
-    background-color: #777777;
-    height: 300px;
-  }
-}
-
-#news1 {
-  background-image: url('/assets/home/news1.jpg');
-}
-
-#news2 {
-  background-image: url('/assets/home/news2.jpg');
-}
-
-#news3 {
-  background-image: url('/assets/home/news3.jpg');
+.more-studies {
+  text-align: center;
+  padding-top: 2em;
 }

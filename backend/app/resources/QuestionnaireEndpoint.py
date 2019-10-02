@@ -20,6 +20,7 @@ from app.wrappers import requires_roles
 #   * It has a date field called "last_updated"
 #   * When calling the endpoint, use the snakecase format of the name.
 
+
 class QuestionnaireEndpoint(flask_restful.Resource):
 
     @auth.login_required
@@ -52,6 +53,8 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         instance = db.session.query(class_ref).filter(class_ref.id == id).first()
         schema = ExportService.get_schema(name, session=db.session)
         request_data = request.get_json()
+        if "_links" in request_data:
+            request_data.pop("_links")
         updated, errors = schema.load(request_data, instance=instance)
 
         if errors:
@@ -115,17 +118,6 @@ class QuestionnaireInfoEndpoint(flask_restful.Resource):
         info_list = sorted(info_list, key=lambda item: item.table_name)
         return ExportInfoSchema(many=True).dump(info_list)
 
-        # all_file_names = os.listdir(os.path.dirname(app.instance_path) + '/app/model/questionnaires')
-        # non_questionnaires = ['mixin', '__']
-        # questionnaire_file_names = []
-        # for index, file_name in enumerate(all_file_names):
-        #     if any(string in file_name for string in non_questionnaires):
-        #         pass
-        #     else:
-        #         f = file_name.replace(".py", "")
-        #         questionnaire_file_names.append(f)
-        # return sorted(questionnaire_file_names)
-
 
 class QuestionnaireDataExportEndpoint(flask_restful.Resource):
 
@@ -146,3 +138,24 @@ class QuestionnaireDataExportEndpoint(flask_restful.Resource):
             return schema.dump(ExportService().get_data(name))
         else:
             return ExportXlsService.export_xls(name=name, app=app)
+
+
+class QuestionnaireUserDataExportEndpoint(flask_restful.Resource):
+
+    @staticmethod
+    def request_wants_json():
+        best = request.accept_mimetypes \
+            .best_match(['application/json', 'text/html'])
+        return best == 'application/json' and \
+               request.accept_mimetypes[best] > \
+               request.accept_mimetypes['text/html']
+
+    @auth.login_required
+    @requires_roles(Role.admin)
+    def get(self, name, user_id):
+        name = ExportService.camel_case_it(name)
+        if self.request_wants_json():
+            schema = ExportService.get_schema(name, many=True)
+            return schema.dump(ExportService().get_data(name))
+        else:
+            return ExportXlsService.export_xls(name=name, user_id=user_id, app=app)

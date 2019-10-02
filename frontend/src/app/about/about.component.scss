@@ -1,0 +1,22 @@
+.enroll {
+  margin: 1em;
+}
+
+#hero {
+  background-image: url('/assets/about/hero.jpg');
+  background-position: 50% 50%;
+  height: 480px;
+}
+
+#feature {
+  background-image: url('/assets/about/feature.jpg');
+  background-position: 100% 20%;
+  height: 480px;
+}
+
+#about-cta {
+  font-weight: 700;
+  font-size: 1.25rem;
+  font-style: italic;
+  margin-bottom: 1em;
+}

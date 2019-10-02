@@ -1,12 +1,19 @@
-<mat-nav-list *ngFor="let step of flow.steps">
+<mat-nav-list *ngFor="let step of flow.steps; let i = index">
   <mat-list-item
     (click)="selectStep(step)"
     [ngClass]="{'active': stepName === step.name, 'step-link': true}"
+    [id]="'step_link_' + i"
   >
-    {{step.label}}
+    <span class="lock">
+      <mat-icon *ngIf="step.type === 'sensitive'" [ngClass]="{'visible': true}">lock</mat-icon>
+      <mat-icon *ngIf="step.type !== 'sensitive'" [ngClass]="{'hidden': true}">lock</mat-icon>
+    </span>
+    <span class="step-link-text">{{step.label}}</span>
     <span fxFlex></span>
-    <mat-icon *ngIf="step.status === 'COMPLETE'" [ngClass]="{'complete': true}">done</mat-icon>
-    <mat-icon *ngIf="step.status !== 'COMPLETE'" [ngClass]="{'incomplete': true}">done</mat-icon>
+    <span class="done">
+      <mat-icon *ngIf="step.status === 'COMPLETE'" [ngClass]="{'visible': true}">done</mat-icon>
+      <mat-icon *ngIf="step.status !== 'COMPLETE'" [ngClass]="{'hidden': true}">done</mat-icon>
+    </span>
   </mat-list-item>
 </mat-nav-list>
 

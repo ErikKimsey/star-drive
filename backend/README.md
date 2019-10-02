@@ -28,6 +28,11 @@ export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
 apt-get install postgresql postgresql-client
 ```
 
+#### ElasticSearch
+We are currently using version 6, and should look at upgrading this in the future when my hair isn't on fire.
+# Debian
+https://medium.com/@pierangelo1982/how-to-install-elasticsearch-6-on-ubuntu-64316dc2de1c
+
 #### Angular
 ```BASH
 npm install -g @angular/cli
@@ -184,7 +189,10 @@ This will auto-generate a new migration that ties the streams together.
 
 ### Migrations with Enum columns
 Alembic probably will not generate migrations that do everything that you need them to do when it comes to handling Enum values.
-Look at migration versions 2fd0ab60fe3a_.py and 5fb917adc751_.py to see some examples of handling enum additions and changes.
+Look at migration versions 2fd0ab60fe3a_.py and 5fb917adc751_.py to see some examples of handling enum additions and changes. 
+2fd0ab60fe3a_.py shows how to delete an existing column and replace it with an enum (I haven't found a way to simply 
+alter the column and get the migrations to upgrade and downgrade successfully). 5fb917adc751_.py shows an example with 
+adding a value to the enum list.
 
 ## Best Practices
 There are a few things I hope to do consistently for this project, to avoid some pitfalls from the [Cadre Academy site](https://education.cadre.virginia.edu/#/home).  When adding code please follow these guidelines:
@@ -293,3 +301,22 @@ ALL the environment settings with the flask command for it to work correctly.
 ```bash
 FLASK_APP=app/__init__.py MIRRORING=true flask db upgrade
 ```
+
+# Production Deployment
+You will need to install:
+  * Python 3
+  * Elastic Search 6
+  * Apache Web Server
+     * mod-wsgi  (for running flask apps within apache)
+  * Postgres 
+ 
+I've tended to set up the website under /var/www/star or /var/www/autismdrive (the new name and url)
+In the /var/www/autismdrive/ I create a python virtual enviroment with the comnand:
+```
+python3 -m venv python-env
+```
+
+
+
+
+ 

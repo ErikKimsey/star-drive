@@ -1,9 +1,0 @@
-<mat-chip-list>
-  <mat-chip
-    *ngFor="let c of categories"
-    [routerLink]="[ '/search/filter' ]"
-    [queryParams]="{'words': c.category.name}"
-    color="primary"
-    selected
-  >{{c.category.name}}</mat-chip>
-</mat-chip-list>

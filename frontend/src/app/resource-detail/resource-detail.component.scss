@@ -1,21 +1,5 @@
-::ng-deep .mat-list .mat-list-item .mat-line {
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-::ng-deep .mat-list .mat-list-item {
-  height: initial !important;
-}
-
-.mat-list-item {
-  margin: 1em 0;
-}
-
-address p {
-  margin: 0;
-}
-
-agm-map {
+#resource-map agm-map {
   height: 400px;
   width: 100%;
+  max-width: 100vw;
 }

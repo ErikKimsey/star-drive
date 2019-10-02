@@ -2,7 +2,6 @@ import datetime
 import importlib
 import re
 
-from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.tz import UTC
 from flask import url_for, logging
 from sqlalchemy import func, desc
@@ -26,14 +25,6 @@ class ExportService:
     TYPE_SUB_TABLE = 'sub-table'
 
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-
-    @staticmethod
-    def start():
-        scheduler = BackgroundScheduler()
-        scheduler.start()
-        scheduler.add_job(ExportService.send_alert_if_exports_not_running,
-                          'interval',
-                          minutes=app.config['EXPORT_CHECK_INTERNAL_MINUTES'])
 
     @staticmethod
     def get_class_for_table(table):
@@ -83,7 +74,7 @@ class ExportService:
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
     @staticmethod
-    def get_data(name, last_updated=None):
+    def get_data(name, user_id=None, last_updated=None):
         model = ExportService.get_class(name)
         query = db.session.query(model)
         if last_updated:
@@ -92,7 +83,13 @@ class ExportService:
                 and 'polymorphic_identity' in model.__mapper_args__:
             query = query.filter(model.type == model.__mapper_args__['polymorphic_identity'])
         query = query.order_by(model.id)
-        return query.all()
+        if user_id:
+            if hasattr(model, 'user_id'):
+                return query.filter(model.user_id == user_id)
+            else:
+                return []
+        else:
+            return query.all()
 
     # Returns a list of classes/tables with information about how they should be exported.
     @staticmethod

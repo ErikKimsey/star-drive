@@ -13,6 +13,7 @@ class ContactQuestionnaire(db.Model):
     __label__ = "Contact Information"
     __question_type__ = ExportService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
+    marketing_other_hide_expression = '!(model.marketing_channel && (model.marketing_channel === "other"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -34,6 +35,7 @@ class ContactQuestionnaire(db.Model):
                 "type": "tel",
                 "label": "Preferred number",
                 "description": "(including area code)",
+                "placeholder": "555-555-5555"
             },
             "validators": {"validation": ["phone"]},
         },
@@ -144,7 +146,7 @@ class ContactQuestionnaire(db.Model):
             "type": "select",
             "template_options": {
                 "label": "",
-                "placeholder": "",
+                "placeholder": "Please select how you heard about us",
                 "description": "",
                 "required": True,
                 "options": [
@@ -167,9 +169,13 @@ class ContactQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Please specify how you heard about us",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.marketing_channel && (model.marketing_channel === "other"))',
+            "hide_expression": marketing_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + marketing_other_hide_expression
+            }
         },
     )
 

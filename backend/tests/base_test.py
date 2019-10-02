@@ -1,6 +1,7 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
 import base64
+import datetime
 import os
 import quopri
 import re
@@ -14,11 +15,13 @@ from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
+from app.model.study_user import StudyUser
 
 
 from flask import json
 
 from app import app, db, elastic_index
+from app.model.admin_note import AdminNote
 from app.model.category import Category
 from app.model.resource_category import ResourceCategory
 from app.model.location import Location
@@ -26,7 +29,7 @@ from app.model.organization import Organization
 from app.model.participant import Participant
 from app.model.resource import Resource
 from app.model.user import User, Role
-
+from app.model.zip_code import ZipCode
 
 def clean_db(db):
     for table in reversed(db.metadata.sorted_tables):
@@ -50,16 +53,17 @@ class BaseTest:
     def tearDownClass(cls):
         db.drop_all()
         db.session.remove()
+        elastic_index.clear()
 
     def setUp(self):
         self.ctx.push()
         clean_db(db)
+        elastic_index.clear()
         self.auths = {}
 
     def tearDown(self):
         db.session.rollback()
         self.ctx.pop()
-
 
     def logged_in_headers(self, user=None):
 
@@ -133,6 +137,14 @@ class BaseTest:
 #        self.assertEqual(db_participant.relationship, participant.relationship)
         return participant
 
+    def construct_admin_note(self, user, resource, id=976, note="I think all sorts of things about this resource and I'm telling you now."):
+        admin_note = AdminNote(id=id, user_id=user.id, resource_id=resource.id, note=note)
+        db.session.add(admin_note)
+        db.session.commit()
+        db_admin_note = db.session.query(AdminNote).filter_by(id=admin_note.id).first()
+        self.assertEqual(db_admin_note.note, admin_note.note)
+        return db_admin_note
+
     def construct_organization(self, name="Staunton Makerspace",
                                description="A place full of surprise, delight, and amazing people. And tools. Lots of exciting tools."):
 
@@ -156,14 +168,19 @@ class BaseTest:
         return db_category
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           phone="555-555-5555", website="http://stardrive.org"):
+                           phone="555-555-5555", website="http://stardrive.org", categories=[], ages=[]):
 
-        resource = Resource(title=title, description=description, phone=phone, website=website)
+        resource = Resource(title=title, description=description, phone=phone, website=website, ages=ages)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
+        db.session.commit()
+        for category in categories:
+            rc = ResourceCategory(resource_id=resource.id, category=category, type='resource')
+            db.session.add(rc)
 
         db_resource = db.session.query(Resource).filter_by(title=resource.title).first()
         self.assertEqual(db_resource.website, resource.website)
+
         elastic_index.add_document(db_resource, 'Resource')
         return db_resource
 
@@ -199,17 +216,29 @@ class BaseTest:
 
     def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
                         participant_description="Even your pet hamster could benefit from participating in this study",
-                        benefit_description="You can expect to have your own rainbow following you around afterwards"):
+                        benefit_description="You can expect to have your own rainbow following you around afterwards",
+                        coordinator_email="hello@study.com", categories=[]):
 
         study = Study(title=title, description=description, participant_description=participant_description,
-                      benefit_description=benefit_description, status=Status.currently_enrolling)
+                      benefit_description=benefit_description, status=Status.currently_enrolling,
+                      coordinator_email=coordinator_email)
+
         study.organization_id = self.construct_organization().id
         db.session.add(study)
         db.session.commit()
-
         db_study = db.session.query(Study).filter_by(title=study.title).first()
         self.assertEqual(db_study.description, description)
+
+        for category in categories:
+            sc = StudyCategory(study_id=db_study.id, category_id=category.id)
+            db.session.add(sc)
+
+        db.session.commit()
         elastic_index.add_document(db_study, 'Study')
+
+        db_study = db.session.query(Study).filter_by(id=db_study.id).first()
+        self.assertEqual(len(db_study.categories), len(categories))
+
         return db_study
 
     def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):
@@ -226,10 +255,11 @@ class BaseTest:
     def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
                            street_address1="123 Some Pl", street_address2="Apt. 45",
                            city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
-                           website="http://stardrive.org"):
+                           website="http://stardrive.org", date=datetime.datetime.now() + datetime.timedelta(days=7)):
 
-        event = Event(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
-                                state=state, zip=zip, phone=phone, website=website)
+        event = Event(title=title, description=description, street_address1=street_address1,
+                      street_address2=street_address2, city=city, state=state, zip=zip, phone=phone, website=website,
+                      date=date)
         event.organization_id = self.construct_organization().id
         db.session.add(event)
 
@@ -237,6 +267,17 @@ class BaseTest:
         self.assertEqual(db_event.website, event.website)
         elastic_index.add_document(db_event, 'Event')
         return db_event
+
+    def construct_zip_code(self, id=24401, latitude=38.146216, longitude=-79.07625):
+        z = ZipCode(id=id, latitude=latitude, longitude=longitude)
+        db.session.add(z)
+        db.session.commit()
+
+        db_z = ZipCode.query.filter_by(id=id).first()
+        self.assertEqual(db_z.id, z.id)
+        self.assertEqual(db_z.latitude, z.latitude)
+        self.assertEqual(db_z.longitude, z.longitude)
+        return db_z
 
     def construct_everything(self):
         self.construct_all_questionnaires()
@@ -248,8 +289,11 @@ class BaseTest:
         event = self.construct_event()
         self.construct_location_category(location.id, cat.name)
         self.construct_study_category(study.id, cat.name)
+        self.construct_zip_code()
         investigator = Investigator(name="Sam I am", organization_id=org.id)
         db.session.add(StudyInvestigator(study = study, investigator = investigator))
+        db.session.add(StudyUser(study=study, user=self.construct_user()))
+        db.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=''))
         db.session.add(investigator)
         db.session.add(EmailLog())
         db.session.add(StepLog())

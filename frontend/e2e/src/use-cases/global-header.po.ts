@@ -1,4 +1,5 @@
-import { AppPage } from '../app-page.po';
+import {AppPage} from '../app-page.po';
+import {ElementFinder} from 'protractor';
 
 export class GlobalHeaderUseCases {
   constructor(private page: AppPage) {
@@ -7,10 +8,7 @@ export class GlobalHeaderUseCases {
   displaySitewideHeader() {
     expect(this.page.getElements('#menu-bar').count()).toEqual(1);
     expect(this.page.getElements('app-logo').count()).toEqual(1);
-  }
-
-  displayUtilityNav() {
-    expect(this.page.getElements('#utility-nav').count()).toEqual(1);
+    expect(this.page.getElements('#uva-header').count()).toEqual(1);
   }
 
   displayLoggedOutState() {
@@ -29,17 +27,17 @@ export class GlobalHeaderUseCases {
 
   displayPrimaryNav() {
     expect(this.page.getElements('#primary-nav').count()).toEqual(1);
-    expect(this.page.getElements('#enroll-button').count()).toEqual(1);
+    expect(this.page.getElements('#about-button').count()).toEqual(1);
     expect(this.page.getElements('#studies-button').count()).toEqual(1);
     expect(this.page.getElements('#resources-button').count()).toEqual(1);
   }
 
   visitHomePage() {
     this.page.clickLinkTo('/home');
-    expect(this.page.getElements('#cta').count()).toEqual(1);
-    expect(this.page.getElements('#cta button').count()).toBeGreaterThan(1);
-    expect(this.page.getElements('.hero-slides .hero-slide').count()).toBeGreaterThan(1);
-    this.page.clickLinkTo('/home');
+    this.page.waitForVisible('app-news-item');
+    expect(this.page.getElements('#hero').count()).toEqual(1);
+    expect(this.page.getElements('.border-box-tile').count()).toBeGreaterThan(1);
+    expect(this.page.getElements('app-news-item').count()).toBeGreaterThan(1);
   }
 
   async displayHomeHero() {
@@ -51,11 +49,10 @@ export class GlobalHeaderUseCases {
     }
   }
 
-  visitEnrollPage() {
-    this.page.clickLinkTo('/enroll');
-    expect(this.page.getElements('.enroll').count()).toEqual(1);
+  visitAboutPage() {
+    this.page.clickLinkTo('/about');
+    expect(this.page.getElements('.about').count()).toEqual(1);
     expect(this.page.getElements('#hero').count()).toEqual(1);
-    expect(this.page.getElements('#feature').count()).toEqual(1);
     this.page.clickLinkTo('/home');
   }
 
@@ -67,14 +64,34 @@ export class GlobalHeaderUseCases {
   }
 
   visitResourcesPage() {
-    this.page.clickLinkTo('/resources');
+    this.page.clickLinkTo('/search');
+    this.page.waitForVisible('app-search-result');
 
     ['resource', 'location', 'event'].forEach(t => {
-      expect(this.page.getElements(`.border-box-tile.${t}`).count()).toEqual(1);
+      expect(this.page.getElements(`app-border-box-tile .${t}`).count()).toEqual(1);
     });
-    expect(this.page.getElements('agm-map').count()).toEqual(1);
+
+    // TO DO: Re-enable this when we support no-address locations
+    // expect(this.page.getElements('agm-map').count()).toEqual(1);
+
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
     expect(this.page.getElements('.resource-gatherer').count()).toBeGreaterThan(1);
     this.page.clickLinkTo('/home');
+  }
+
+  async checkForDoubleNavLabels() {
+    await this.page.resizeTo(1280, 720);
+    const spans: ElementFinder[] = await this.page.getElements('#resources-button .mat-button-wrapper span');
+    let numDisplayed = 0;
+
+    for (const s of spans) {
+      const isDisplayed = await s.isDisplayed();
+      if (isDisplayed) {
+        numDisplayed++;
+      }
+    }
+
+    await expect(numDisplayed).toEqual(1);
+    await this.page.maximize();
   }
 }

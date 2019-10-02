@@ -1,19 +1,16 @@
-// Import theming functions
-@import '~@angular/material/theming';
-@import '../../stardrive_material';
-
-// Load the UVA Theme
-@include stardrive-theme($stardrive-theme);
+@import '../../config';
+@import '../../mixins';
 
 .result-item {
   margin-top: 2em;
+  padding-bottom: 2em;
   position: relative;
 
   @include top-border-dots;
 
   .title {
     margin: 0px;
-    color: mat-color($stardrive-primary, 500, 1);
+    color: $brand-primary;
     font-weight: 800;
     font-style: italic;
     text-transform: uppercase;
@@ -25,12 +22,12 @@
 .type {
   text-transform: uppercase;
   white-space: nowrap;
-  color: mat-color($stardrive-primary, 300, 1);
+  color: $brand-primary-muted;
   font-size: 3em;
   background-color: transparent;
 
   &:hover {
-    color: mat-color($stardrive-primary, default, 1);
+    color: $brand-primary;
     background-color: transparent;
   }
 }
@@ -39,6 +36,18 @@
   font-weight: 700;
 }
 
-.muted {
-  color: #999999;
+.highlights .date, .description .date {
+  color: $brand-accent;
+  font-weight: 700;
 }
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  line-height: 2;
+}
+.status-currently-enrolling     { color: $brand-accent; }
+.status-study-in-progress       { color: $brand-primary-tint-1; }
+.status-results-being-analyzed  { color: $brand-primary-tint-2; }
+.status-study-results-published { color: $brand-primary-tint-3; }

@@ -5,6 +5,18 @@
 >
   <h1>User:</h1>
   <div
+    fxFlex="20%"
+    fxLayoutGap="2em"
+  >
+    <button
+      mat-flat-button
+      (click)="exportUserData()"
+      color="accent"
+    >
+      Export User Data
+    </button>
+  </div>
+  <div
     fxLayout="row"
   >
     <div>
@@ -53,7 +65,6 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-
     </div>
   </div>
   <h2 *ngIf="user.participants.length > 0">Related Participants:</h2>
@@ -68,4 +79,20 @@
       <app-participant-detail [participant]="p"></app-participant-detail>
     </mat-card>
   </div>
+  <mat-card *ngIf="adminNotes && adminNotes.length > 0">
+    <mat-card-title>Admin Notes</mat-card-title>
+    <mat-card-content>
+      <div
+        *ngFor="let adminNote of adminNotes; let i = index;"
+      >
+        <p mat-line>
+          <a [href]="'/#/resource/' + adminNote.resource_id">
+            <b>Resource #{{adminNote.resource_id}} - {{adminNote.resource.title}}</b>
+          </a>
+          <i> - note last updated: {{adminNote.last_updated | date:'short'}}</i>
+        </p>
+        <p mat-line>{{adminNote.note}}</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>

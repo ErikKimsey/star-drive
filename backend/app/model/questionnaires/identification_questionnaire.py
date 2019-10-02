@@ -13,6 +13,7 @@ class IdentificationQuestionnaire(db.Model):
     __label__ = "Identification"
     __question_type__ = ExportService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
+    relationship_to_participant_other_hide_expression = '!(model.relationship_to_participant && (model.relationship_to_participant === "other"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -52,9 +53,13 @@ class IdentificationQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter your relationship",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.relationship_to_participant && (model.relationship_to_participant === "other"))',
+            "hide_expression": relationship_to_participant_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + relationship_to_participant_other_hide_expression
+            }
         },
     )
     first_name = db.Column(
@@ -201,9 +206,21 @@ class IdentificationQuestionnaire(db.Model):
 
     def get_field_groups(self):
         return {
+                "relationship": {
+                    "RELATIONSHIP_REQUIRED": ['dependent'],
+                    "fields": [
+                        "relationship_to_participant",
+                        "relationship_to_participant_other",
+                    ],
+                    "display_order": 0,
+                    "wrappers": ["card"],
+                    "template_options": {
+                        "label": "Your relationship to your child or the person with autism on whom you are providing information:"
+                    },
+                },
                 "intro": {
                     "fields": [],
-                    "display_order": 0,
+                    "display_order": 1,
                     "wrappers": ["help"],
                     "template_options": {
                         "description": {
@@ -214,18 +231,6 @@ class IdentificationQuestionnaire(db.Model):
                                 "dependent": "Please answer the following questions about your child or the person with autism on whom you are providing information",
                             }
                         }
-                    },
-                },
-                "relationship": {
-                    "RELATIONSHIP_REQUIRED": ['dependent'],
-                    "fields": [
-                        "relationship_to_participant",
-                        "relationship_to_participant_other",
-                    ],
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": "Your relationship to your child or the person with autism on whom you are providing information:"
                     },
                 },
             }

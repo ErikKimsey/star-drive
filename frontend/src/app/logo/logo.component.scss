@@ -1,9 +1,26 @@
+@import '../../material';
+
 #logo {
   display: flex;
   align-items: center;
   justify-content: center;
 
+  &.dark-lg a, &.dark a { color: $brand-primary; }
+  &.light-lg a, &.light a { color: white; }
+
   &.dark-lg, &.light-lg {
+    a {
+      @include mat-typography-level-to-styles($custom-typography, display-3);
+      text-transform: uppercase;
+      margin-top: 4rem;
+      margin-bottom: 4rem;
+      font-size: 2.5rem;
+
+      @media (min-width: 959px) { font-size: 3rem; }
+      @media (min-width: 960px) { font-size: 3.5rem; }
+      @media (min-width: 1280px) { font-size: 4rem; }
+    }
+
     img {
       min-width: 120px;
       max-width: 600px;
@@ -17,6 +34,11 @@
   }
 
   &.dark, &.light {
+    a {
+      @include mat-typography-level-to-styles($custom-typography, display-1);
+      text-transform: uppercase;
+    }
+
     img {
       min-width: 40px;
       max-width: 200px;

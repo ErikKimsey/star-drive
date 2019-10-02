@@ -5,10 +5,13 @@ from flask import Blueprint, jsonify, url_for
 from flask_restful import reqparse
 
 from app import app
+from app.resources.RelatedResultsEndpoint import RelatedResultsEndpoint
 from app.resources.StatusEndpoint import StatusEndpoint
 from app.resources.Auth import auth_blueprint
 from app.resources.EmailLogEndpoint import EmailLogListEndpoint
 from app.resources.SearchEndpoint import SearchEndpoint
+from app.resources.SearchResourcesEndpoint import SearchResourcesEndpoint
+from app.resources.SearchStudiesEndpoint import SearchStudiesEndpoint
 from app.resources.StepLogEndpoint import StepLogListEndpoint
 from app.resources.Tracking import tracking_blueprint
 from app.resources.FlowEndpoint import (
@@ -19,6 +22,11 @@ from app.resources.FlowEndpoint import (
 from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
 from app.resources.EmailLogEndpoint import EmailLogEndpoint
 from app.resources.StepLogEndpoint import StepLogEndpoint
+from app.resources.AdminNoteEndpoint import (
+    AdminNoteListByUserEndpoint,
+    AdminNoteListByResourceEndpoint,
+    AdminNoteListEndpoint,
+    AdminNoteEndpoint)
 from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint
 from app.resources.InvestigatorEndpoint import InvestigatorEndpoint, InvestigatorListEndpoint
 from app.resources.SessionEndpoint import SessionEndpoint
@@ -50,6 +58,7 @@ from app.resources.QuestionnaireEndpoint import (
     QuestionnaireListEndpoint,
     QuestionnaireListMetaEndpoint,
     QuestionnaireDataExportEndpoint,
+    QuestionnaireUserDataExportEndpoint,
     QuestionnaireInfoEndpoint)
 from app.resources.SessionStatusEndpoint import SessionStatusEndpoint
 from app.resources.StudyAndCategoryEndpoint import (
@@ -63,6 +72,17 @@ from app.resources.StudyAndInvestigatorEndpoint import (
     StudyInvestigatorEndpoint,
     InvestigatorByStudyEndpoint,
     StudyInvestigatorListEndpoint
+)
+from app.resources.StudyAndUserEndpoint import (
+    StudyByUserEndpoint,
+    StudyInquiryByUserEndpoint,
+    StudyEnrolledByUserEndpoint,
+    StudyUserEndpoint,
+    UserByStudyEndpoint,
+    StudyUserListEndpoint
+)
+from app.resources.StudyInquiryEndpoint import (
+    StudyInquiryEndpoint
 )
 from app.resources.UserAndParticipantEndpoint import (
     ParticipantBySessionEndpoint
@@ -90,6 +110,8 @@ from app.resources.ExportEndpoint import (
     ExportListEndpoint
 )
 from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
+from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
+
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -155,6 +177,8 @@ endpoints = [
     (CategoryByResourceEndpoint, "/resource/<resource_id>/category"),
     (ResourceCategoryListEndpoint, "/resource_category"),
     (ResourceCategoryEndpoint, "/resource_category/<id>"),
+    (AdminNoteListByResourceEndpoint, "/resource/<resource_id>/admin_note"),
+
     # Studies
     (StudyListEndpoint, "/study"),
     (StudyEndpoint, "/study/<id>"),
@@ -164,6 +188,10 @@ endpoints = [
     (InvestigatorByStudyEndpoint, "/study/<study_id>/investigator"),
     (StudyInvestigatorListEndpoint, "/study_investigator"),
     (StudyInvestigatorEndpoint, "/study_investigator/<id>"),
+    (UserByStudyEndpoint, "/study/<study_id>/user"),
+    (StudyUserListEndpoint, "/study_user"),
+    (StudyUserEndpoint, "/study_user/<id>"),
+    (StudyInquiryEndpoint, "/study_inquiry"),
 
     # Investigators
     (InvestigatorListEndpoint, "/investigator"),
@@ -178,7 +206,11 @@ endpoints = [
     # User Schema, Admin endpoints
     (UserListEndpoint, "/user"),
     (UserEndpoint, "/user/<id>"),
+    (StudyByUserEndpoint, "/user/<user_id>/study"),
+    (StudyInquiryByUserEndpoint, "/user/<user_id>/inquiry/study"),
+    (StudyEnrolledByUserEndpoint, "/user/<user_id>/enrolled/study"),
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
+    (AdminNoteListByUserEndpoint, "/user/<user_id>/admin_note"),
     # Participants
     (ParticipantListEndpoint, "/participant"),
     (ParticipantEndpoint, "/participant/<id>"),
@@ -190,6 +222,7 @@ endpoints = [
     (QuestionnaireListMetaEndpoint, "/q/<string:name>/meta"),
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
     (QuestionnaireDataExportEndpoint, "/q/<string:name>/export"),
+    (QuestionnaireUserDataExportEndpoint, "/q/<string:name>/export/user/<string:user_id>"),
     # Flow Endpoint
     (FlowEndpoint, "/flow/<string:name>/<string:participant_id>"),
     (FlowListEndpoint, "/flow"),
@@ -197,12 +230,21 @@ endpoints = [
     (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
     # Search Endpoint
     (SearchEndpoint, "/search"),
+    (SearchResourcesEndpoint, "/search/resources"),
+    (SearchStudiesEndpoint, "/search/studies"),
+    (RelatedResultsEndpoint, "/related"),
+
     (ExportListEndpoint, "/export"),
     (ExportEndpoint, "/export/<string:name>"),
     (EmailLogListEndpoint, "/email_log"),
     (StepLogListEndpoint, "/step_log"),
+    (AdminNoteListEndpoint, "/admin_note"),
+    (AdminNoteEndpoint, "/admin_note/<string:id>"),
     (StatusEndpoint, "/status"),
     (DataTransferLogEndpoint, "/data_transfer_log"),
+
+    # ZIP Code Endpoint
+    (ZipCodeCoordsEndpoint, "/zip_code_coords/<id>"),
 
 ]
 

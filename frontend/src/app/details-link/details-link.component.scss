@@ -1,0 +1,55 @@
+@import '../../material';
+
+a {
+  transition: all 0.5s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+
+  [class*="details-link-text"] {
+    @include mat-typography-level-to-styles($custom-typography, title);
+    font-style: italic;
+    color: $brand-primary;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .details-link-text-1x {
+    font-size: 1.125rem;
+    margin-left: 0.5rem;
+  }
+
+  .details-link-text-2x {
+    font-size: 1.5rem;
+    margin-left: 0.75rem;
+  }
+
+  [class*="icofont-"] {
+    color: $brand-accent;
+    transition: all 0.5s;
+  }
+}
+
+a {
+  .details-link-icon {
+    transform: rotate(0deg);
+  }
+
+  &.selected {
+    .details-link-icon {
+      transform: rotate(90deg);
+    }
+  }
+
+  &.hover {
+    transform: translateX(10px);
+
+    &.selected {
+      transform: translateY(10px);
+    }
+  }
+}
+
+.muted {
+  color: $brand-gray;
+}

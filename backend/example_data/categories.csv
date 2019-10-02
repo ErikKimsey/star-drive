@@ -6,12 +6,15 @@ Treatment and Therapies ,
     Medication,Treatment and Therapies 
     Early Intervention,Treatment and Therapies 
     Applied Behavior Analysis,Treatment and Therapies 
-    Speech and Communication Supports,Treatment and Therapies 
-    Occupational Therapy ,Treatment and Therapies 
+    Speech and Communication,Treatment and Therapies
+    Occupational Therapy ,Treatment and Therapies
+    Physical Therapy, Treatment and Therapies
+    Music Therapy, Treatment and Therapies
     Counseling,Treatment and Therapies 
           Cognitive Behavioral Therapy ,    Counseling
           Dialectical Behavior Therapy,    Counseling
-    Social Skills Training,Treatment and Therapies 
+    Social Skills Training,Treatment and Therapies
+				Video Modeling, Treatment and Therapies
 Physical and Mental Health ,
      Wellness,Physical and Mental Health 
               Dental Care,     Wellness
@@ -42,13 +45,13 @@ Adulthood and Transition,
       Adult Programs ,Adulthood and Transition
              Residential Program,      Adult Programs 
              Adult Day Program,      Adult Programs 
-Familiy Supports and Parent Training ,
-      Parent Training ,Familiy Supports and Parent Training 
-      Support Groups,Familiy Supports and Parent Training 
-      Respite ,Familiy Supports and Parent Training 
-      Autism-friendly Events,Familiy Supports and Parent Training 
-      Recreation & Camps,Familiy Supports and Parent Training 
-      Family Relationship ,Familiy Supports and Parent Training 
+Family Supports and Parent Training ,
+      Parent Training ,Family Supports and Parent Training
+      Support Groups,Family Supports and Parent Training
+      Respite ,Family Supports and Parent Training
+      Autism-friendly Events,Family Supports and Parent Training
+      Recreation & Camps,Family Supports and Parent Training
+      Family Relationship ,Family Supports and Parent Training
               Siblings ,      Family Relationship 
 Financial Assistance and Advocacy,
       Medicaid ,Financial Assistance and Advocacy
@@ -83,12 +86,4 @@ National ,Locations
 Type of Resources ,
 Handout ,Type of Resources 
 Book ,Type of Resources 
-Event,Type of Resources 
-Life Ages,
-Pre-K (0 - 5 years),Life Ages
-Childhood (0 - 13 years),Life Ages
-School age (6 - 13 years),Life Ages
-Transition age (14 - 22 years),Life Ages
-Adulthood (23 - 64),Life Ages
-Aging (65+),Life Ages
-All Ages,Life Ages
+Event,Type of Resources

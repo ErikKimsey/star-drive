@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -20,6 +17,7 @@ class Resource(db.Model):
                                db.ForeignKey('organization.id'))
     phone = db.Column(db.String)
     website = db.Column(db.String)
+    ages = db.Column(db.ARRAY(db.String), default=[])
     categories = db.relationship("ResourceCategory", back_populates="resource")
 
     __mapper_args__ = {
@@ -28,4 +26,13 @@ class Resource(db.Model):
     }
 
     def indexable_content(self):
-        return self.description
+        return ' '.join(filter(None, (self.category_names(),
+                                      self.title,
+                                      self.description)))
+
+    def category_names(self):
+        cat_text = ''
+        for cat in self.categories:
+            cat_text = cat_text + ' ' + cat.category.indexable_content()
+
+        return cat_text + ' ' + ' '.join(self.ages)

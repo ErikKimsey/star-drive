@@ -1,7 +1,4 @@
-// Import theming functions
-@import '~@angular/material/theming';
-@import '../../stardrive_material';
-@include stardrive-theme($stardrive-theme);
+@import '../../config';
 
 .userList {
   text-align: center;
@@ -25,7 +22,7 @@
 
 mat-row:hover {
   cursor: pointer;
-  background: mat-color($stardrive-accent, 100, 1.0);
+  background-color: $brand-accent-light;
 }
 
 .mat-column-id, .mat-column-role {

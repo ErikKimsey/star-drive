@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Flow} from '../_models/flow';
 import {Router} from '@angular/router';
+import {ParticipantRelationship} from '../_models/participantRelationship';
 
 @Component({
   selector: 'app-flow-complete',
@@ -29,7 +30,11 @@ export class FlowCompleteComponent implements OnInit {
 
   goResources($event) {
     $event.preventDefault();
-    this.router.navigate(['resources']);
+    this.router.navigate(['search']);
   }
 
+  enrollDependent($event) {
+    $event.preventDefault();
+    this.router.navigate(['terms', ParticipantRelationship.DEPENDENT]);
+  }
 }

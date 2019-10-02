@@ -13,6 +13,8 @@ class DemographicsQuestionnaire(db.Model):
     __label__ = "Demographics"
     __question_type__ = ExportService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 8
+    gender_identity_other_hide_expression = '!(model.gender_identity && (model.gender_identity === "genderOther"))'
+    race_ethnicity_other_hide_expression = '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -70,7 +72,6 @@ class DemographicsQuestionnaire(db.Model):
                     {"value": "no_answer", "label": "Prefer not to answer"},
                 ],
                 "label": "Your current gender identity:",
-                "description": "(how you describe yourself)"
             },
             "expression_properties": {
                 "template_options.label": {
@@ -78,9 +79,9 @@ class DemographicsQuestionnaire(db.Model):
                         "dependent": '(formState.preferredName || "Your child") + "\'s current gender identity"',
                     }
                 },
-                "template_options.description": {
+                "template_options.placeholder": {
                     "RELATIONSHIP_SPECIFIC": {
-                        "dependent": '"(how " + (formState.preferredName || "your child") + " describes themselves):"',
+                        "dependent": '"Please select " + (formState.preferredName || "your child") + "\'s gender"',
                     }
                 }
             },
@@ -93,9 +94,13 @@ class DemographicsQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter gender identity",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.gender_identity && (model.gender_identity === "genderOther"))',
+            "hide_expression": gender_identity_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + gender_identity_other_hide_expression
+            }
         },
     )
     race_ethnicity = db.Column(
@@ -104,6 +109,7 @@ class DemographicsQuestionnaire(db.Model):
             "display_order": 3.1,
             "type": "multicheckbox",
             "template_options": {
+                "label": "Race/Ethnicity",
                 "type": "array",
                 "required": True,
                 "options": [
@@ -118,6 +124,7 @@ class DemographicsQuestionnaire(db.Model):
                 ],
                 "description": "(select all that apply)"
             },
+            "validators": {"required": "multicheckbox"},
         },
     )
     race_ethnicity_other = db.Column(
@@ -127,9 +134,13 @@ class DemographicsQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter race/ethnicity",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))',
+            "hide_expression": race_ethnicity_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + race_ethnicity_other_hide_expression
+            }
         },
     )
 

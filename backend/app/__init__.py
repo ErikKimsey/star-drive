@@ -1,3 +1,8 @@
+import logging.config
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+from config.logging import logging_config
 
 from flask import Flask, jsonify
 from flask_migrate import Migrate
@@ -13,6 +18,8 @@ from app.elastic_index import ElasticIndex
 from app.email_service import EmailService
 from app.rest_exception import RestException
 
+logging.config.dictConfig(logging_config)
+
 app = Flask(__name__, instance_relative_config=True)
 
 # Load the default configuration
@@ -27,7 +34,6 @@ if "TESTING" in os.environ and os.environ["TESTING"] == "true":
 
 if "MIRRORING" in os.environ and os.environ["MIRRORING"] == "true":
     app.config.from_object('config.mirror')
-
 
 # Database Configuration
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -91,6 +97,7 @@ def _load_data(data_loader):
     data_loader.load_studies()
     data_loader.load_users()
     data_loader.load_participants()
+    data_loader.load_zip_codes()
 
 
 @app.cli.command()
@@ -114,6 +121,7 @@ def cleardb():
 def initindex():
     """Delete all information from the elastic search Index."""
     click.echo('Loading data into Elastic Search')
+    elastic_index.clear()
     from app import data_loader
     data_loader = data_loader.DataLoader()
     data_loader.build_index()
@@ -142,40 +150,51 @@ def reset():
 
 @app.cli.command()
 def resourcereset():
-    """Remove all data about resources, studies, and trainings, and recreate it from the example data files"""
+    """Used for Staging updates where we don't want to do a full reset and wipe away all user data.
+    Does not clear and rebuild index because that is a separate step of the prod update.
+    Remove all data about resources, studies, and trainings, and recreate it from the example data files"""
     click.echo('Re-populating resources, studies, and trainings from the example data files')
     from app import data_loader
     data_loader = data_loader.DataLoader()
-    data_loader.clear_index()
     data_loader.clear_resources()
     data_loader.load_categories()
     data_loader.load_events()
     data_loader.load_locations()
     data_loader.load_resources()
     data_loader.load_studies()
-    data_loader.build_index()
+    data_loader.load_zip_codes()
 
 
 @app.cli.command()
 def run_full_export():
     """Remove all data and recreate it from the example data files"""
     if app.config["MIRRORING"]:
-        click.echo('Exporting all data.')
         from app.import_service import ImportService
-        importer = ImportService(app, db)
-        importer.run_full_backup()
+        click.echo('Exporting all data.')
+        import_service = ImportService(app, db)
+        import_service.run_full_backup()
     else:
         click.echo('This system is not configured to run exports. Ingoring.')
 
 
-
 from app import views
 
-# Cron scheduler
-if app.config["MIRRORING"]:
-    from app.import_service import ImportService
-    importer = ImportService(app, db)
-    importer.start()
-else:
+
+def schedule_tasks():
     from app.export_service import ExportService
-    ExportService.start()
+    from app.import_service import ImportService
+
+    scheduler = BackgroundScheduler(daemon=True)
+    scheduler.start()
+    if app.config["MIRRORING"]:
+        import_service = ImportService(app, db)
+        scheduler.add_job(import_service.run_backup, 'interval',
+                          minutes=import_service.import_interval_minutes)
+        scheduler.add_job(import_service.run_full_backup, 'interval', days=1)
+    else:
+        scheduler.add_job(ExportService.send_alert_if_exports_not_running, 'interval',
+                          minutes=app.config['EXPORT_CHECK_INTERNAL_MINUTES'])
+
+
+# Cron scheduler
+app.before_first_request(schedule_tasks)

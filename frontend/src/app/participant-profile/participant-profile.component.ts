@@ -64,12 +64,13 @@ export class ParticipantProfileComponent implements OnInit {
 
   goTerms($event) {
     $event.preventDefault();
-    this.router.navigate(['terms', {relationship:this.participant.relationship}]);
+    this.router.navigate(['terms', this.participant.relationship, {preview:true}]);
   }
 
   chooseAvatar($event, participant): void {
     const dialogRef = this.dialog.open(AvatarDialogComponent, {
-      width: `${window.innerWidth / 2}px`,
+      maxWidth: '100vw',
+      maxHeight: '100vh',
       data: { participant: participant }
     });
 

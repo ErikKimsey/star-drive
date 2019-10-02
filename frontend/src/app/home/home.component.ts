@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { NewsItem } from '../_models/news-item';
-import { HitLabel } from '../_models/query';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {Study} from '../_models/study';
+import {ApiService} from '../_services/api/api.service';
+import {NewsItem} from '../_models/news-item';
+import {HitType} from '../_models/hit_type';
 
 @Component({
   selector: 'app-home',
@@ -9,76 +11,43 @@ import { HitLabel } from '../_models/query';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  heroSlides: NewsItem[] = [
-    {
-      title: 'Driving discovery',
-      description: 'Current studies in autism research',
-      url: '/studies',
-      type: HitLabel.STUDY,
-      img: '/assets/home/hero-research.jpg',
-      imgClass: 'center-center'
-    },
-    {
-      title: 'Offering connections',
-      description: 'Enroll in the Autism Registry to get involved in autism research',
-      url: '/enroll',
-      type: HitLabel.STUDY,
-      img: '/assets/home/hero-enroll.jpg',
-      imgClass: 'bottom-center'
-    },
-    {
-      title: 'Engaging the community',
-      description: 'Local autism support organizations, online resources, and in-person events',
-      url: '/search?Type=location&Type=resource&Type=event',
-      type: HitLabel.STUDY,
-      img: '/assets/home/hero-nurse.jpg',
-      imgClass: 'center-center'
-    },
-    {
-      title: 'Sharing best practices',
-      description: 'Autism training for clinical professionals',
-      url: '/search/filter?words=professional%20training',
-      type: HitLabel.STUDY,
-      img: '/assets/home/hero-teacher-students.jpg',
-      imgClass: 'center-center'
-    },
-  ];
-
-  newsItems: NewsItem[] = [
-    {
-      title: 'ABC Event',
-      description: 'New ABC Event about XYZ',
-      url: '/resource/0',
-      type: HitLabel.EVENT,
-      img: '/assets/home/news0.jpg' },
-    {
-      title: 'XYZ Support Group Location',
-      description: 'Charlottesville support group for XYZ',
-      url: '/resource/1',
-      type: HitLabel.LOCATION,
-      img: '/assets/home/news1.jpg' },
-    {
-      title: 'ABC XYZ Online Resource',
-      description: 'New ABC training available to parents in XYZ',
-      url: '/resource/2',
-      type: HitLabel.RESOURCE,
-      img: '/assets/home/news2.jpg' },
-  ];
+  currentStudies: Study[];
+  newsItems: NewsItem[];
 
   constructor(
+    private api: ApiService,
     private router: Router
-  ) { }
+  ) {
+    this.api.getStudies().subscribe(all => {
+      this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
+      this.newsItems = this._studiesToNewsItems(this.currentStudies);
+    });
+    this.api.serverStatus.subscribe(s => {
+      if (s.mirroring) {
+        router.navigate(['mirrored']);
+      }
+    });
+  }
 
   ngOnInit() {
   }
 
-  goEnroll($event) {
-    $event.preventDefault();
-    this.router.navigate(['enroll']);
-  }
+  private _studiesToNewsItems(studies: Study[]): NewsItem[] {
+    if (this.currentStudies && this.currentStudies.length > 0) {
+      return studies
+        .sort((a, b) => (a.id > b.id) ? 1 : -1)
+        .map((s, i) => {
+          const n: NewsItem = {
+            title: s.short_title || s.title,
+            description: s.short_description || s.description,
+            url: `/study/${s.id}`,
+            type: HitType.STUDY,
+            img: s.image_url,
+            imgClass: 'center-center',
+          };
 
-  goResources($event) {
-    $event.preventDefault();
-    this.router.navigate(['resources']);
+          return n;
+        });
+    }
   }
 }

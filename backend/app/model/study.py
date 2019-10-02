@@ -27,19 +27,36 @@ class Study(db.Model):
     __label__ = "Research Studies"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
+    short_title = db.Column(db.String)
+    short_description = db.Column(db.String)
+    image_url = db.Column(db.String)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     description = db.Column(db.String)
     participant_description = db.Column(db.String)
     benefit_description = db.Column(db.String)
     investigators = db.relationship("StudyInvestigator", back_populates="study")
+    coordinator_email = db.Column(db.String)
+    eligibility_url = db.Column(db.String)
     organization_id = db.Column('organization_id', db.Integer,
                                 db.ForeignKey('organization.id'))
     location = db.Column(db.String)
     status = db.Column(db.Enum(Status))
+    ages = db.Column(db.ARRAY(db.String), default=[])
     categories = db.relationship("StudyCategory", back_populates="study")
 
     def indexable_content(self):
-        return ' '.join(filter(None, (self.description,
+        return ' '.join(filter(None, (self.category_names(),
+                                      self.title,
+                                      self.short_title,
+                                      self.short_description,
+                                      self.description,
                                       self.participant_description,
                                       self.benefit_description,
                                       self.location)))
+
+    def category_names(self):
+        cat_text = ''
+        for cat in self.categories:
+            cat_text = cat_text + ' ' + cat.category.indexable_content()
+
+        return cat_text + ' ' + ' '.join(self.ages)

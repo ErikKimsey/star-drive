@@ -1,149 +1,299 @@
-<app-loading *ngIf="loading"></app-loading>
-<mat-sidenav-container
-  [id]="'sidenavContainer'"
-  class="mat-typography"
-  [hasBackdrop]="false"
+<div
+  id="hero"
+  class="gradient-overlay container with-escaping-tiles"
+  ngClass.lt-md="margin-bottom-none"
 >
-  <mat-sidenav
-    #sidenav
-    class="sidenav filters"
+  <div class="hero-content">
+    <h1>Find Autism Support</h1>
+  </div>
+  <div
+    class="row escaping-tiles-1x"
+    fxLayout="row"
+    fxLayoutGap="40px"
+    fxLayoutAlign="center auto"
+    id="TopOfSearch"
   >
-    <h2>
-      <span>
-        <mat-icon>filter_list</mat-icon>
-        Filter Resources By:
-      </span>
-      <div class="spacer"></div>
-      <button
-        mat-icon-button
-        (click)="sideNav.close()"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
-    </h2>
-    <div class="spacer"></div>
-    <mat-accordion *ngIf="!loading">
-      <ng-container *ngFor="let facet of query.facets">
+    <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
+      <mat-label>Resource types</mat-label>
+      <mat-select [(value)]="selectedType">
+        <mat-select-trigger>
+          <app-type-icon
+            *ngIf="selectedType"
+            [iconType]="selectedType && selectedType.name"
+            [size]="1"
+          ></app-type-icon>
+          <span class="type-label" *ngIf="selectedType">{{selectedType.label}}</span>
+        </mat-select-trigger>
+        <mat-option
+          *ngFor="let type of resourceTypes"
+          [value]="type"
+          (click)="selectType(type.name)"
+        >
+          <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
+          <span class="type-label">{{type.label}}</span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <app-border-box-tile
+      *ngFor="let type of resourceTypesFiltered()"
+      fxShow.md fxShow.lg fxShow.xl
+      fxHide.lt-md
+      fxFlex.gt-sm="calc(33% - 160px)"
+      fxFlex.sm="calc(50% - 120px)"
+      [iconSize]="2"
+      [iconType]="type.name"
+      [title]="type.label"
+      [linkSize]="1"
+      [isSelected]="query && query.types && query.types.includes(type.name)"
+      (click)="selectType(type.name)"
+    ></app-border-box-tile>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row margin-bottom-none">
+    <h1 *ngIf="selectedType" fragment="filter-top">
+      {{selectedType.label}}
+    </h1>
+    <h1 *ngIf="!selectedType" fragment="filter-top">
+      All Resources
+    </h1>
+    <app-resource-add-button [currentUser]="currentUser"></app-resource-add-button>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="80px" fxLayoutAlign="space-evenly start">
+      <mat-accordion displayMode="flat">
         <mat-expansion-panel
-          *ngIf="facet.facetCounts.length > 0"
-          [ngClass]="{'filter-facet': true}"
+          fxFlex="100%"
+          fxFlex.gt-sm="calc(30% - 160px)"
+          class="filters"
         >
           <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{facet.field}}
-            </mat-panel-title>
+            {{(panelElement && panelElement.expanded && mobileQuery.matches) ? 'Hide' : ''}} Filter & Sort
           </mat-expansion-panel-header>
-          <mat-list>
-            <mat-list-item
-              *ngFor="let count of facet.facetCounts"
-              (click)="addFilter(facet.field, count.category)"
-              [ngClass]="{'filter-facet-item': true}"
-            >
-              {{count.category}}
-              <div fxFlex></div>
-              <span class="hit-count">{{count.hit_count}}</span>
-            </mat-list-item>
-          </mat-list>
-        </mat-expansion-panel>
-      </ng-container>
-    </mat-accordion>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <div
-      class="container"
-      fxLayout="column"
-      fxLayoutAlign="start center"
-      *ngIf="!loading"
-    >
-      <div class="row search-tools">
-        <ul class="applied-filters">
-          <li *ngIf="sideNav.opened">
-            <button
-              mat-button
-              (click)="sideNav.close()"
-            >
-              <i class="icofont-hand-left icofont-2x"></i>
-              Select a filter
-            </button>
-          </li>
-          <li *ngIf="!sideNav.opened">
-            <button
-              mat-button
-              (click)="sideNav.open()"
-            >
-              <mat-icon>filter_list</mat-icon>
-              Add a filter
-            </button>
-          </li>
-          <li
-            *ngIf="query.words"
-            class="applied-filter"
-          >
-            <button
-              mat-button
-              (click)="removeWords()"
-            >
-              <mat-icon>remove_circle_outline</mat-icon>
-              Search: {{query.words}}
-            </button>
-          </li>
 
-          <ng-container *ngFor="let filter of query.filters">
-            <li
-              *ngFor="let fieldValue of filter.value"
-              class="applied-filter"
+          <div class="sort-order">
+            <h3>Sort by</h3>
+            <mat-radio-group
+              *ngIf="selectedSort && selectedSort.name"
+              [(ngModel)]="selectedSort.name"
+              fxLayout="column"
             >
-              <button
-                mat-button
-                (click)="removeFilter(filter.field, fieldValue)"
-              >
-                <mat-icon>remove_circle_outline</mat-icon>
-                {{filter.field}} : {{fieldValue}}
-              </button>
-            </li>
-          </ng-container>
-        </ul>
-        <div class="sort-order">
-          <mat-form-field>
-            <mat-label>
-              Sort Results By:
-            </mat-label>
-            <mat-select value="{{selectedSort.name}}">
-              <mat-option
-                *ngFor="let s of sortMethods"
-                (click)="sortBy(s)"
-                value="{{s.name}}"
-              >{{s.label}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </div>
+              <ng-container *ngFor="let s of sortMethods">
+                <mat-radio-button
+                  *ngIf="isSortVisible(s)"
+                  (click)="noLocation ? openLocationDialog() : sortBy(s.name)"
+                  [value]="s.name"
+                  [disabled]="isSortDisabled(s)"
+                >
+                  {{s.label}}
+                  <ng-container *ngIf="(s.name === 'Relevance' && query.words != '')">
+                    to "{{query.words}}"
+                  </ng-container>
+                  <ng-container *ngIf="(s.name === 'Distance')">
+                    <ng-container *ngIf="isZipCode(storedZip)">({{storedZip}})</ng-container>
+                    <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</ng-container>
+                    <button mat-button (click)="openLocationDialog()" matTooltip="Set your location">
+                      <mat-icon>location_searching</mat-icon>
+                      <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set location</ng-container>
+                    </button>
+                  </ng-container>
+                  <button *ngIf="(s.name !== 'Distance')" mat-button class="ghost"><mat-icon>code</mat-icon></button>
+                </mat-radio-button>
+              </ng-container>
+            </mat-radio-group>
+          </div>
+
+          <div class="filters-column">
+            <h3>Narrow your results</h3>
+            <h4 class="mat-subheader">By Age</h4>
+            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+            <div *ngIf="query">
+              <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
+              <app-search-filter
+                [aggregations]="query.age_counts"
+                [label_map]="ageLabels"
+                (filterSelected)="selectAgeRange($event)"
+                [ngClass]="'filter-by-age'"
+              ></app-search-filter>
+            </div>
+            <h4 class="mat-subheader">By Type</h4>
+            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+            <app-search-filter
+              *ngIf="query"
+              [aggregations]="query.type_counts"
+              [label_map]="typeLabels"
+              (filterSelected)="selectType($event)"
+              [ngClass]="'filter-by-type'"
+            ></app-search-filter>
+            <h4 class="mat-subheader">By Topic</h4>
+            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+            <app-search-topics
+              *ngIf="query"
+              [category]="query.category"
+              (categorySelected)="selectCategory($event)"
+              [ngClass]="'filter-by-topic'"
+            ></app-search-topics>
+          </div>
+        </mat-expansion-panel>
+
+      </mat-accordion>
+
       <div
-        class="row search-results"
-        style="margin-top: 0"
+        fxFlex.gt-sm="calc(70% - 160px)"
+        fxLayout="column"
+        fxLayoutAlign="start start"
       >
-        <div
-          id="results"
-          fxLayout="column"
-          fxLayoutGap="40px"
-          *ngIf="!(loading || hideResults)"
-        >
-          <app-search-result
-            *ngFor="let hit of query.hits"
-            [hit]="hit"
-            [mapLoc]="mapLoc"
-          >
-          </app-search-result>
+        <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
+          <mat-chip-list class="applied-filters">
+
+            <ng-container *ngIf="query && query.words">
+              <mat-chip
+                (click)="removeWords()"
+                class="applied-filter applied-filter-keyword"
+              >
+                <span class="applied-filter-label">"{{query.words}}"</span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *ngFor="let age of query.ages let i = index">
+                <mat-chip
+                  (click)="selectAgeRange()"
+                  class="applied-filter applied-filter-age"
+                >
+                  <span class="applied-filter-label">{{ageLabels[age]}}</span>
+                  <mat-icon>close</mat-icon>
+                </mat-chip>
+            </ng-container>
+
+            <div *ngIf="query.types.length === 1">
+              <mat-chip
+                (click)="selectType()"
+                class="applied-filter applied-filter-type">
+                <span class="applied-filter-label">{{typeLabels[query.types[0]]}}</span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </div>
+
+            <ng-container *ngIf="query && query.category && query.category.id">
+              <mat-chip
+                (click)="removeCategory()"
+                class="applied-filter applied-filter-topic"
+              >
+                <div class="applied-filter-label" fxLayout="row" fxLayoutAlign="center center">
+                  <ng-container *ngIf="query.category.parent && query.category.parent.parent">
+                    {{query.category.parent.parent.name}}
+                    <mat-icon>chevron_right</mat-icon>
+                  </ng-container>
+                  <ng-container *ngIf="query.category.parent">
+                    {{query.category.parent.name}}
+                    <mat-icon>chevron_right</mat-icon>
+                  </ng-container>
+                  {{query.category.name}}
+                </div>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </ng-container>
+
+          </mat-chip-list>
+          <p *ngIf="paginatorElement" [ngClass]="{'num-results': true, 'ghost': (!query || (query.total === 0))}">Page {{paginatorElement.pageIndex + 1}} of {{query.total}} results</p>
         </div>
+        <agm-map
+          *ngIf="showMap()"
+          [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
+          [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
+          [streetViewControl]="false"
+          mapTypeId="roadmap"
+          [zoom]="7"
+          (mapReady)="mapLoad($event)"
+          [scrollwheel]="null"
+        >
+          <agm-marker
+            *ngIf="mapLoc"
+            [latitude]="mapLoc.lat"
+            [longitude]="mapLoc.lng"
+            iconUrl="/assets/map/your-location.svg"
+          ></agm-marker>
+          <agm-marker-cluster imagePath="/assets/map/m">
+            <ng-container *ngFor="let hit of getMapResults()">
+              <agm-marker
+                *ngIf="hit.hasCoords()"
+                [latitude]="hit.latitude"
+                [longitude]="hit.longitude"
+              >
+                <agm-info-window>
+                  <a
+                    class="title mat-h2"
+                    href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
+                  >{{hit.title}}</a>
+                  <p>{{hit.description}}</p>
+                  <a
+                    class="chevron-link"
+                    [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
+                    routerLinkActive="router-link-active"
+                  >Resource Details - {{hit.milesFrom(mapLoc || defaultLoc)}}mi</a>
+                </agm-info-window>
+              </agm-marker>
+            </ng-container>
+          </agm-marker-cluster>
+        </agm-map>
+        <div class="search-results margin-top-none">
+          <div
+            id="results"
+            fxLayout="column"
+            fxLayoutGap="40px"
+          >
+            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+              <div *ngIf="query && query.hits.length === 0" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center center" class="pad-4">
+                <h2>No results currently available.</h2>
+                <p>We could not find any results for your search.  Please try removing some of the conditions
+                by clicking on the 'x' in the tiles above.  This will broaden the search and give you more results.</p>
+                <h3>Check back soon for more updates!</h3>
+              </div>
+            <div *ngIf="query && query.hits.length > 0">
+              <app-search-result
+                *ngFor="let hit of query.hits"
+                [hit]="hit"
+                [mapLoc]="mapLoc"
+              >
+              </app-search-result>
+            </div>
+          </div>
       </div>
     </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row margin-top-none">
     <mat-paginator
       #paginator
-      [length]="query.total"
+      [length]="query ? query.total : 0"
       [pageSize]="pageSize"
       [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
-      (page)="updatePage()"
+      (page)="updatePage($event)"
+      [ngClass]="{'ghost': (!query || (query.total === 0))}"
     >
     </mat-paginator>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+
+    <h1>Resource partners</h1>
+    <p class="pad-0 margin-bottom-none">We are partnering with the following initiatives and organizations to identify resources that will improve
+      outcomes for individuals with autism and their families.</p>
+    <div fxLayout="row" fxLayoutAlign="space-between">
+      <a
+        *ngFor="let rg of resourceGatherers"
+        [href]="rg.url"
+        [title]="rg.name"
+        [matTooltip]="rg.shortName + ' - ' + rg.description"
+        class="resource-gatherer"
+      >
+        <img
+          [alt]="rg.shortName"
+          [src]="rg.image"
+        >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+

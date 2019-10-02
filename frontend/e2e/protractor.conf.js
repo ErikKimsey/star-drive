@@ -4,13 +4,13 @@
 const { SpecReporter } = require('jasmine-spec-reporter');
 
 exports.config = {
-  allScriptsTimeout: 11000,
+  allScriptsTimeout: 30000,
   specs: [
     './src/*.e2e-spec.ts'
   ],
   capabilities: {
     chromeOptions: {
-      // args: ['--headless']
+      args: [ "--window-size=1024x768" ]
     },
     'browserName': 'chrome'
   },
