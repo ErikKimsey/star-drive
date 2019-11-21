@@ -12,6 +12,7 @@ import {Resource} from '../../_models/resource';
 import {ResourceCategory} from '../../_models/resource_category';
 import {Study} from '../../_models/study';
 import {StudyCategory} from '../../_models/study_category';
+import {StudyInvestigator} from '../../_models/study_investigator';
 import {StepLog} from '../../_models/step_log';
 import {User} from '../../_models/user';
 import {UserSearchResults} from '../../_models/user_search_results';
@@ -89,6 +90,8 @@ export class ApiService {
     studybycategory: '/api/category/<category_id>/study',
     studycategory: '/api/study_category/<id>',
     studycategorylist: '/api/study_category',
+    studyinvestigator: '/api/study_investigator/<id>',
+    studyinvestigatorlist: '/api/study_investigator',
     studyinquiry: '/api/study_inquiry',
     studylist: '/api/study',
     user: '/api/user/<id>',
@@ -378,6 +381,19 @@ export class ApiService {
     return this.httpClient.post<Organization>(this._endpointUrl('organizationlist'), organization)
       .pipe(catchError(this._handleError));
   }
+
+  /** Add StudyInvestigator */
+  addStudyInvestigator(studyInvestigator: StudyInvestigator): Observable<StudyInvestigator> {
+    return this.httpClient.post<StudyInvestigator>(this._endpointUrl('studyinvestigatorlist'), studyInvestigator)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Delete StudyInvestigator */
+  deleteStudyInvestigator(studyInvestigator: StudyInvestigator): Observable<StudyInvestigator> {
+    return this.httpClient.delete<StudyInvestigator>(this._endpointUrl('studyinvestigator').replace('<id>', studyInvestigator.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
 
   /** Get User */
   getUser(id: number): Observable<User> {

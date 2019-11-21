@@ -86,6 +86,56 @@ export class StudyFormComponent implements OnInit {
         },
       },
       {
+        key: 'investigators',
+        name: 'investigators',
+        type: 'repeat',
+        wrappers: ["card"],
+        templateOptions: {
+          label: 'Investigators',
+          description: "Add an investigator",
+        },
+        fieldArray: {
+          fieldGroup: [
+            {
+              key: 'name',
+              name: 'name',
+              type: 'input',
+              templateOptions: {
+                label: 'Full Name of Investigator',
+                required: true,
+              },
+            },
+            {
+              key: 'title',
+              name: 'title',
+              type: 'input',
+              templateOptions: {
+                label: 'Title',
+              },
+            },
+            {
+              key: 'organization',
+              name: 'organization',
+              type: 'autocomplete',
+              templateOptions: {
+                label: 'Organization',
+                filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
+              },
+            },
+            {
+              key: 'bio_link',
+              name: 'bio_link',
+              type: 'input',
+              templateOptions: {
+                label: 'Bio Link',
+                placeholder: 'Please enter link to investigator bio',
+              },
+              validators: {"validation": ["url"]},
+            },
+          ],
+        },
+      },
+      {
         key: 'organization',
         type: 'autocomplete',
         templateOptions: {
@@ -202,6 +252,7 @@ export class StudyFormComponent implements OnInit {
         this.api.getStudy(studyId).subscribe(study => {
           this.study = study as Study;
           this.model = this.study;
+          this.loadStudyInvestigators(study);
           this.loadStudyCategories(study, () => this.loadForm());
         });
       } else {
@@ -226,6 +277,15 @@ export class StudyFormComponent implements OnInit {
     }
   }
 
+  loadStudyInvestigators(study: Study) {
+    this.model.investigators = [];
+    if (study.study_investigators.length > 0) {
+      for (const i in study.study_investigators) {
+        this.model.investigators.push(study.study_investigators[i].investigator);
+      }
+    }
+  }
+
   loadForm() {
     this.form = new FormGroup({});
     this.options = {
@@ -234,6 +294,25 @@ export class StudyFormComponent implements OnInit {
       }
     };
     this.state = this.pageState.SHOW_FORM;
+  }
+
+  updateRelatedModel(model_name, model_name_plural) {
+    const join_name = 'study_' + model_name_plural;
+    const api_name = 'Study' + model_name.charAt(0).toUpperCase() + model_name.slice(1);
+    const model_id = model_name + '_id';
+    const relModIds = this.study[join_name].map(relMod => relMod[model_name].id);
+    // Add the new related models
+    for (const relMod in this.model[model_name_plural]) {
+      if (!relModIds.includes(Number(relMod))) {
+        this.api[`add${api_name}`]({"study_id": this.study.id, model_id: Number(relMod)}).subscribe();
+      }
+    }
+    // Remove any deleted related models
+    for (const relMod in this.study[join_name]) {
+      if (!this.model[model_name_plural][this.study[join_name][relMod][model_id]]) {
+        this.api[`delete${api_name}`](this.study[join_name][relMod]).subscribe();
+      }
+    }
   }
 
   updateStudyCategories() {
@@ -255,6 +334,22 @@ export class StudyFormComponent implements OnInit {
   addStudyCategories(study_id) {
     for (const cat in this.model.categories) {
       this.api.addStudyCategory({study_id: study_id, category_id: Number(cat)}).subscribe();
+    }
+  }
+
+  updateStudyInvestigators() {
+    const siIds = this.study.study_investigators.map(si => si.investigator.id);
+    // Add the new investigators
+    for (const invest in this.model.investigators) {
+      if (!siIds.includes(Number(invest))) {
+        this.api.addStudyInvestigator({study_id: this.study.id, investigator_id: Number(invest)}).subscribe();
+      }
+    }
+    // Remove any deleted investigators
+    for (const si in this.study.study_investigators) {
+      if (!this.model.investigators[this.study.study_investigators[si].investigator_id]) {
+        this.api.deleteStudyInvestigator(this.study.study_investigators[si]).subscribe();
+      }
     }
   }
 
@@ -288,7 +383,9 @@ export class StudyFormComponent implements OnInit {
       if (this.createNew) {
         this.updateOrganization(() => this.addAndClose());
       } else {
-        this.updateStudyCategories();
+        // this.updateStudyCategories();
+        this.updateRelatedModel('category', 'categories');
+        this.updateRelatedModel('investigator', 'investigators');
         this.updateOrganization(() => this.updateAndClose());
       }
     }
