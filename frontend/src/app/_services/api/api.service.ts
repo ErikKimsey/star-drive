@@ -6,6 +6,7 @@ import {AdminNote} from '../../_models/admin_note';
 import {Category} from '../../_models/category';
 import {EmailLog} from '../../_models/email_log';
 import {Flow} from '../../_models/flow';
+import {Investigator} from '../../_models/investigator';
 import {Participant} from '../../_models/participant';
 import {Query} from '../../_models/query';
 import {Resource} from '../../_models/resource';
@@ -54,6 +55,7 @@ export class ApiService {
     flowquestionnaire: '/api/flow/<flow>/<questionnaire_name>',
     flowquestionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     forgot_password: '/api/forgot_password',
+    investigatorlist: '/api/investigator',
     location: '/api/location/<id>',
     locationbycategory: '/api/category/<category_id>/location',
     locationcategory: '/api/location_category/<id>',
@@ -379,6 +381,18 @@ export class ApiService {
   /** Add Organization */
   addOrganization(organization: Organization): Observable<Organization> {
     return this.httpClient.post<Organization>(this._endpointUrl('organizationlist'), organization)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getInvestigators */
+  getInvestigators(): Observable<Investigator[]> {
+    return this.httpClient.get<Investigator[]>(this._endpointUrl('investigatorlist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Add Investigator */
+  addInvestigator(investigator: Investigator): Observable<Investigator> {
+    return this.httpClient.post<Investigator>(this._endpointUrl('investigatorlist'), investigator)
       .pipe(catchError(this._handleError));
   }
 
