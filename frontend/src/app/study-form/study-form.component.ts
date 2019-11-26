@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../_services/api/api.service';
 import { Study } from '../_models/study';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Organization } from '../_models/organization';
 import { Investigator } from '../_models/investigator';
 
@@ -27,205 +27,39 @@ export class StudyFormComponent implements OnInit {
 
   model: any = {};
   updatedModel: any = {};
-  form: FormGroup;
-  fields: FormlyFieldConfig[] = [
-      {
-        key: 'title',
-        type: 'input',
-        templateOptions: {
-          label: 'Title',
-          placeholder: 'Please enter the title of your study',
-          required: true,
-        },
-      },
-      {
-        key: 'short_title',
-        type: 'input',
-        templateOptions: {
-          label: 'Short Title',
-          placeholder: 'Please enter the short display title of your study',
-          required: true,
-          maxLength: 55,
-        },
-      },
-      {
-        key: 'description',
-        type: 'textarea',
-        templateOptions: {
-          label: 'Description',
-          placeholder: 'Please enter the description of your study',
-          required: true,
-        },
-      },
-      {
-        key: 'short_description',
-        type: 'textarea',
-        templateOptions: {
-          label: 'Short Description',
-          placeholder: 'Please enter the short display description of your study',
-          required: true,
-          maxLength: 155,
-        },
-      },
-      {
-        key: 'participant_description',
-        type: 'textarea',
-        templateOptions: {
-          label: 'Participant Description',
-          placeholder: 'Who are you looking for to participate in your study?',
-          required: true,
-        },
-      },
-      {
-        key: 'benefit_description',
-        type: 'textarea',
-        templateOptions: {
-          label: 'Benefit Description',
-          placeholder: 'How will participants benefit from your study?',
-          required: true,
-        },
-      },
-      {
-        key: 'investigators',
-        name: 'investigators',
-        type: 'repeat',
-        wrappers: ["card"],
-        templateOptions: {
-          label: 'Investigators',
-          description: "Add an investigator",
-        },
-        fieldArray: {
-          fieldGroup: [
-            {
-              key: 'name',
-              name: 'name',
-              type: 'input',
-              templateOptions: {
-                label: 'Full Name of Investigator',
-                required: true,
-              },
-            },
-            {
-              key: 'title',
-              name: 'title',
-              type: 'input',
-              templateOptions: {
-                label: 'Title',
-              },
-            },
-            {
-              key: 'organization',
-              name: 'organization',
-              type: 'autocomplete',
-              templateOptions: {
-                label: 'Organization',
-                filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
-              },
-            },
-            {
-              key: 'bio_link',
-              name: 'bio_link',
-              type: 'input',
-              templateOptions: {
-                label: 'Bio Link',
-                placeholder: 'Please enter link to investigator bio',
-              },
-              validators: {"validation": ["url"]},
-            },
-          ],
-        },
-      },
-      {
-        key: 'organization',
-        type: 'autocomplete',
-        templateOptions: {
-          label: 'Organization',
-          filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
-        },
-      },
-      {
-        key: 'location',
-        type: 'input',
-        templateOptions: {
-          label: 'Location Name',
-          placeholder: 'Please describe where the study will take place',
-        },
-      },
-      {
-        key: 'status',
-        type: 'select',
-        templateOptions: {
-          label: 'Study Status',
-          placeholder: 'Please select the study status',
-          options: [
-            {'value': 'currently_enrolling', 'label': 'Currently Enrolling'},
-            {'value': 'study_in_progress', 'label': 'Study in progress'},
-            {'value': 'results_being_analyzed', 'label': 'Results being analyzed'},
-            {'value': 'study_results_published', 'label': 'Study results published'}
-          ],
-          required: true,
-        },
-      },
-      {
-        key: 'coordinator_email',
-        type: 'input',
-        templateOptions: {
-          label: 'Coordinator Email',
-          placeholder: 'Please enter the email address to which study inquires will be sent',
-        },
-        validators: {"validation": ["email"]},
-      },
-      {
-        key: 'eligibility_url',
-        type: 'input',
-        templateOptions: {
-          label: 'Eligibility Link',
-          placeholder: 'If you have an eligibilty screener, please enter the link',
-        },
-        validators: {"validation": ["url"]},
-      },
-      {
-        key: 'categories',
-        type: 'multicheckbox',
-        templateOptions: {
-          label: 'Topics',
-          options: this.api.getCategories(),
-          valueProp: 'id',
-          labelProp: 'name',
-        },
-      },
-      {
-        key: 'ages',
-        type: 'multicheckbox',
-        templateOptions: {
-          label: 'Age Ranges',
-          type: "array",
-          options: [
-            {'value': 'pre-k', 'label': 'Pre-K (0 - 5 years)'},
-            {'value': 'school', 'label': 'School age (6 - 13 years)'},
-            {'value': 'transition', 'label': 'Transition age (14 - 22 years)'},
-            {'value': 'adult', 'label': 'Adulthood (23 - 64)'},
-            {'value': 'aging', 'label': 'Aging (65+)'}
-          ],
-        },
-      },
-    ];
+  // form: FormGroup;
+  studyForm: FormGroup;
 
-  options: FormlyFormOptions;
+  statusOptions = [
+      {'value': 'currently_enrolling', 'label': 'Currently Enrolling'},
+      {'value': 'study_in_progress', 'label': 'Study in progress'},
+      {'value': 'results_being_analyzed', 'label': 'Results being analyzed'},
+      {'value': 'study_results_published', 'label': 'Study results published'}
+    ];
+  ageOptions = [
+      {'value': 'pre-k', 'label': 'Pre-K (0 - 5 years)'},
+      {'value': 'school', 'label': 'School age (6 - 13 years)'},
+      {'value': 'transition', 'label': 'Transition age (14 - 22 years)'},
+      {'value': 'adult', 'label': 'Adulthood (23 - 64)'},
+      {'value': 'aging', 'label': 'Aging (65+)'}
+    ];
   orgOptions: Organization[];
+  investOptions: Investigator[];
 
   createNew = false;
 
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private formBuilder: FormBuilder
   ) {
     this.getOrganizations();
+    this.getInvestigators();
   }
 
   ngOnInit() {
-    this.model.createNew = false;
+    // this.model.createNew = false;
     this.loadData();
   }
 
@@ -236,11 +70,18 @@ export class StudyFormComponent implements OnInit {
     )
   }
 
-  filterOrganizations(name: string): Organization[] {
-    return this.orgOptions.filter(org =>
-      org.name.toLowerCase().includes(name.toLowerCase())
+  getInvestigators() {
+    this.api.getInvestigators().subscribe( invests => {
+       return this.investOptions = invests;
+      }
     )
   }
+  //
+  // filterOrganizations(name: string): Organization[] {
+  //   return this.orgOptions.filter(org =>
+  //     org.name.toLowerCase().includes(name.toLowerCase())
+  //   )
+  // }
 
   loadData() {
     this.route.params.subscribe(params => {
@@ -287,12 +128,30 @@ export class StudyFormComponent implements OnInit {
   }
 
   loadForm() {
-    this.form = new FormGroup({});
-    this.options = {
-      formState: {
-        mainModel: this.model
-      }
-    };
+    // this.form = new FormGroup({});
+
+    this.studyForm = this.formBuilder.group({
+      title: [this.study.title],
+      short_title: [this.study.short_title],
+      description: [this.study.description],
+      short_description: [this.study.short_description],
+      participant_description: [this.study.participant_description],
+      benefit_description: [this.study.benefit_description],
+      investigators: [this.study.investigators],
+      organization: [this.study.organization],
+      location: [this.study.location],
+      status: [this.study.status],
+      coordinator_email: [this.study.coordinator_email],
+      eligibility_url: [this.study.eligibility_url],
+      categories: [this.study.categories],
+      ages: [this.study.ages],
+    });
+    console.log('studyForm', this.studyForm);
+    // this.options = {
+    //   formState: {
+    //     mainModel: this.model
+    //   }
+    // };
     this.state = this.pageState.SHOW_FORM;
   }
 
@@ -378,17 +237,18 @@ export class StudyFormComponent implements OnInit {
   }
 
   submit() {
+
     // Post to the study endpoint, and then close
-    if (this.form.valid) {
-      if (this.createNew) {
-        this.updateOrganization(() => this.addAndClose());
-      } else {
-        // this.updateStudyCategories();
-        this.updateRelatedModel('category', 'categories');
-        this.updateRelatedModel('investigator', 'investigators');
-        this.updateOrganization(() => this.updateAndClose());
-      }
-    }
+    // if (this.form.valid) {
+    //   if (this.createNew) {
+    //     this.updateOrganization(() => this.addAndClose());
+    //   } else {
+    //     // this.updateStudyCategories();
+    //     this.updateRelatedModel('category', 'categories');
+    //     this.updateRelatedModel('investigator', 'investigators');
+    //     this.updateOrganization(() => this.updateAndClose());
+    //   }
+    // }
   }
 
   addAndClose() {

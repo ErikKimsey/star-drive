@@ -6,24 +6,102 @@
     message="Loading..."
   ></app-loading>
 
-  <form
-    *ngIf="state === pageState.SHOW_FORM"
-    [formGroup]="form"
-    class="pad-2"
-  >
-    <h1>Study Details</h1>
-
-    <formly-form
-      [form]="form"
-      [model]="model"
-      [fields]="fields"
-      [options]="options"
+  <form [formGroup]="studyForm">
+    <h1>Study Form</h1>
+    <div
+      fxLayout="column"
+      fxLayoutGap="1em"
     >
-    </formly-form>
+    <mat-form-field>
+      <mat-label>Title</mat-label>
+      <input type="text" matInput placeholder="What is the full title of your study?" formControlName="title" required>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Short Title</mat-label>
+      <input type="text" matInput placeholder="Short Title" formControlName="short_title">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <input type="text" matInput placeholder="Description" formControlName="description">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Short Description</mat-label>
+      <input type="text" matInput placeholder="Short Description" formControlName="short_description">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Participant Description</mat-label>
+      <input type="text" matInput placeholder="Participant Description" formControlName="participant_description">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Benefit Description</mat-label>
+      <input type="text" matInput placeholder="Benefit Description" formControlName="benefit_description">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Investigators</mat-label>
+      <mat-select multiple [formControl]="investigators">
+        <mat-option *ngFor="let investigator of investOptions" [value]="investigator">{{investigator.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Organization</mat-label>
+      <mat-select [formControl]="organization">
+        <mat-option>None</mat-option>
+        <mat-option *ngFor="let org of orgOptions" [value]="org">{{org.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Location</mat-label>
+      <input type="text" matInput placeholder="Location" formControlName="location">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Status</mat-label>
+      <input type="text" matInput placeholder="Status" formControlName="status">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Status</mat-label>
+      <mat-select [formControl]="status">
+        <mat-option>None</mat-option>
+        <mat-option *ngFor="let st of statusOptions" [value]="st.value">{{st.label}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Email</mat-label>
+      <input type="text" matInput placeholder="Coordinator Email" formControlName="coordinator_email">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Eligibility Url</mat-label>
+      <input type="text" matInput placeholder="Eligibility Url" formControlName="eligibility_url">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Topics</mat-label>
+      <input type="text" matInput placeholder="Topics" formControlName="categories">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Ages</mat-label>
+      <mat-select [formControl]="ages" multiple>
+        <mat-option *ngFor="let age of ageOptions" [value]="age.value">{{age.label}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!--<button type="submit" [disabled]="!profileForm.valid">Submit</button>-->
 
     <div
-      class="button-row"
-      fxLayoutGap="2em"
+      fxLayout="row"
+      fxLayoutGap="1em"
     >
       <button
         *ngIf="form"
@@ -31,7 +109,7 @@
         type="button"
         (click)="submit()"
         color="primary"
-        [disabled]="!form.valid"
+        [disabled]="!studyForm.valid"
         id="save-next-button"
       >Save</button>
 
@@ -64,5 +142,6 @@
       >Permanently Delete This Study!!!
       </button>
     </div>
+  </div>
   </form>
 </div>
