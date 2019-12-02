@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../_services/api/api.service';
 import { Study } from '../_models/study';
-import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Organization } from '../_models/organization';
 import { Investigator } from '../_models/investigator';
 
@@ -27,7 +26,6 @@ export class StudyFormComponent implements OnInit {
 
   model: any = {};
   updatedModel: any = {};
-  // form: FormGroup;
   studyForm: FormGroup;
 
   statusOptions = [
@@ -76,12 +74,6 @@ export class StudyFormComponent implements OnInit {
       }
     )
   }
-  //
-  // filterOrganizations(name: string): Organization[] {
-  //   return this.orgOptions.filter(org =>
-  //     org.name.toLowerCase().includes(name.toLowerCase())
-  //   )
-  // }
 
   loadData() {
     this.route.params.subscribe(params => {
@@ -128,30 +120,23 @@ export class StudyFormComponent implements OnInit {
   }
 
   loadForm() {
-    // this.form = new FormGroup({});
-
     this.studyForm = this.formBuilder.group({
-      title: [this.study.title],
-      short_title: [this.study.short_title],
-      description: [this.study.description],
-      short_description: [this.study.short_description],
-      participant_description: [this.study.participant_description],
-      benefit_description: [this.study.benefit_description],
+      title: [this.study.title, Validators.required],
+      short_title: [this.study.short_title, Validators.required],
+      description: [this.study.description, Validators.required],
+      short_description: [this.study.short_description, Validators.required],
+      participant_description: [this.study.participant_description, Validators.required],
+      benefit_description: [this.study.benefit_description, Validators.required],
       investigators: [this.study.investigators],
       organization: [this.study.organization],
       location: [this.study.location],
-      status: [this.study.status],
+      status: [this.study.status, Validators.required],
       coordinator_email: [this.study.coordinator_email],
       eligibility_url: [this.study.eligibility_url],
+      image_url: [this.study.image_url],
       categories: [this.study.categories],
       ages: [this.study.ages],
     });
-    console.log('studyForm', this.studyForm);
-    // this.options = {
-    //   formState: {
-    //     mainModel: this.model
-    //   }
-    // };
     this.state = this.pageState.SHOW_FORM;
   }
 
@@ -237,7 +222,7 @@ export class StudyFormComponent implements OnInit {
   }
 
   submit() {
-
+    console.log('here is the form on submit', this.studyForm);
     // Post to the study endpoint, and then close
     // if (this.form.valid) {
     //   if (this.createNew) {

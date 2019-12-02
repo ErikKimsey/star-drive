@@ -19,27 +19,27 @@
 
     <mat-form-field>
       <mat-label>Short Title</mat-label>
-      <input type="text" matInput placeholder="Short Title" formControlName="short_title">
+      <input type="text" matInput placeholder="Short Title" formControlName="short_title" required>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Description</mat-label>
-      <input type="text" matInput placeholder="Description" formControlName="description">
+      <input type="text" matInput placeholder="Description" formControlName="description" required>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Short Description</mat-label>
-      <input type="text" matInput placeholder="Short Description" formControlName="short_description">
+      <input type="text" matInput placeholder="Short Description" formControlName="short_description" required>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Participant Description</mat-label>
-      <input type="text" matInput placeholder="Participant Description" formControlName="participant_description">
+      <input type="text" matInput placeholder="Participant Description" formControlName="participant_description" required>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Benefit Description</mat-label>
-      <input type="text" matInput placeholder="Benefit Description" formControlName="benefit_description">
+      <input type="text" matInput placeholder="Benefit Description" formControlName="benefit_description" required>
     </mat-form-field>
 
     <mat-form-field>
@@ -64,12 +64,7 @@
 
     <mat-form-field>
       <mat-label>Status</mat-label>
-      <input type="text" matInput placeholder="Status" formControlName="status">
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-label>Status</mat-label>
-      <mat-select [formControl]="status">
+      <mat-select [formControl]="status" required>
         <mat-option>None</mat-option>
         <mat-option *ngFor="let st of statusOptions" [value]="st.value">{{st.label}}</mat-option>
       </mat-select>
@@ -86,6 +81,11 @@
     </mat-form-field>
 
     <mat-form-field>
+      <mat-label>Image Url</mat-label>
+      <input type="text" matInput placeholder="Image Url" formControlName="image_url">
+    </mat-form-field>
+
+    <mat-form-field>
       <mat-label>Topics</mat-label>
       <input type="text" matInput placeholder="Topics" formControlName="categories">
     </mat-form-field>
@@ -97,14 +97,12 @@
       </mat-select>
     </mat-form-field>
 
-    <!--<button type="submit" [disabled]="!profileForm.valid">Submit</button>-->
-
     <div
       fxLayout="row"
       fxLayoutGap="1em"
     >
       <button
-        *ngIf="form"
+        *ngIf="studyForm"
         mat-flat-button
         type="button"
         (click)="submit()"
@@ -114,7 +112,7 @@
       >Save</button>
 
       <button
-        *ngIf="form"
+        *ngIf="studyForm"
         mat-flat-button
         type="button"
         (click)="onCancel()"
