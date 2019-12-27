@@ -6,6 +6,8 @@ import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {PasswordRequirements} from '../_models/password_requirements';
 import {GoogleAnalyticsService} from '../google-analytics.service';
+import {scrollToTop} from '../../util/scrollToTop';
+import {User} from '../_models/user';
 
 @Component({
   selector: 'app-password-reset',
@@ -100,11 +102,15 @@ export class PasswordResetComponent implements OnInit {
 
       this.authenticationService.resetPassword(this.model['password']['password'], this.token).subscribe(
         data => {
-          this.router.navigate(['profile']);
+          this._goToReturnUrl(data);
           this.googleAnalyticsService.accountEvent('reset_password');
         }, error1 => {
+          if (error1.code == 'token_expired') {
+            this.errorMessage = 'The link for resetting your password has expired. Please return to the password reset page to generate a new email.';
+          } else {
+            this.errorMessage = 'We encountered an error resetting your password.  Please contact support.';
+          }
           this.formState = 'form';
-          this.errorMessage = error1;
           this.changeDetectorRef.detectChanges();
         });
     }
@@ -112,5 +118,12 @@ export class PasswordResetComponent implements OnInit {
 
   updateValidationState() {
     this.form.updateValueAndValidity();
+  }
+
+  private _goToReturnUrl(user: User) {
+    const returnUrl = localStorage.getItem('returnUrl');
+    if (user) {
+      this.router.navigateByUrl(returnUrl || '/profile').then(_ => scrollToTop());
+    }
   }
 }

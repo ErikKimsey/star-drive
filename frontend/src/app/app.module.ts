@@ -27,6 +27,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatSortModule} from '@angular/material/sort';
 import {MatStepperModule} from '@angular/material/stepper';
+import {MatTabsModule} from '@angular/material';
 import {MatTableModule} from '@angular/material/table';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -128,6 +129,8 @@ import {environment} from '../environments/environment';
 import {ConfigService} from './_services/config.service';
 import {AddButtonComponent} from './add-button/add-button.component';
 import {EditButtonComponent} from './edit-button/edit-button.component';
+import {ParticipantAdminComponent} from './participant-admin/participant-admin.component';
+import {UvaEducationComponent} from './uva-education/uva-education.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -263,6 +266,8 @@ export class FormlyConfig {
     ContactItemComponent,
     AddButtonComponent,
     EditButtonComponent,
+    ParticipantAdminComponent,
+    UvaEducationComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
@@ -300,6 +305,7 @@ export class FormlyConfig {
     MatSlideToggleModule,
     MatSortModule,
     MatStepperModule,
+    MatTabsModule,
     MatTableModule,
     MatToolbarModule,
     MatTooltipModule,

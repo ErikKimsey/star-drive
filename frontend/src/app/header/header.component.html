@@ -109,6 +109,14 @@
             fxShow.gt-lg
           >Find Resources</span>
         </a></li>
+        <li><a
+          mat-button
+          [routerLink]="[ '/uva-education' ]"
+          routerLinkActive="selected"
+          id="uva-education-button"
+        >
+          Education
+        </a></li>
 
         <li *ngIf="!currentUser"><a
           mat-button
@@ -141,15 +149,7 @@
           id="profile-button"
         >
           <mat-icon>account_circle</mat-icon>
-          <span
-            fxHide
-            fxShow.lt-lg
-          > Profile</span>
-          <span
-            fxHide
-            fxShow.lg
-            fxShow.gt-lg
-          > View Profile</span>
+          Profile
         </a></li>
         <li *ngIf="currentUser"><a
           mat-button
@@ -220,6 +220,13 @@
     id="resources-button-mobile"
     (click)="toggleMenu()"
   >Find Resources</a>
+  <a
+    mat-button
+    [routerLink]="[ '/uva-education' ]"
+    routerLinkActive="selected"
+    id="uva-education-button-mobile"
+    (click)="toggleMenu()"
+  >UVA Education</a>
   <a
     mat-button
     *ngIf="!currentUser"

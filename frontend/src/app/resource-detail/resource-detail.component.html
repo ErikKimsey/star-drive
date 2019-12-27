@@ -21,6 +21,38 @@
       <h2>About this resource</h2>
       <p>{{resource.description}}</p>
 
+      <div *ngIf="safeVideoLink">
+        <div *ngIf="currentUser">
+          <iframe fxFlex="100%" height="500px" [src]='safeVideoLink' frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div *ngIf="!currentUser">
+          <h2>Interested in watching this video?</h2>
+          <div class="video-image-box">
+            <div class="gradient-overlay image">
+              <img [src]="'https://img.youtube.com/vi/' + resource.video_code +'/hqdefault.jpg'">
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutGap="20px"
+              class="button-overlay"
+            >
+              <button
+                mat-flat-button
+                color="accent"
+                [routerLink]="[ '/register' ]"
+                [queryParams]="{ returnUrl: router.url }"
+              >Join Autism DRIVE</button>
+              <button
+                mat-flat-button
+                color="accent"
+                [routerLink]="[ '/login' ]"
+                [queryParams]="{ returnUrl: router.url }"
+              >Log In</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <mat-card id="resource-contact">
         <mat-card-title><h4>Contact</h4></mat-card-title>
         <mat-card-content>

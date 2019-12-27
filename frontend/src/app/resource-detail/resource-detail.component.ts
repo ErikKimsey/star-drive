@@ -1,13 +1,14 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, SecurityContext} from '@angular/core';
 import {ApiService} from '../_services/api/api.service';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {LatLngLiteral} from '@agm/core';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {AdminNote} from '../_models/admin_note';
 import {ContactItem} from '../_models/contact_item';
 import {formatDate} from '@angular/common';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-resource-detail',
@@ -23,15 +24,19 @@ export class ResourceDetailComponent implements OnInit {
   contactItems: ContactItem[];
   typeName: string;
   showInfoWindow = false;
+  safeVideoLink: SafeResourceUrl;
 
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
+    private router: Router,
     private authenticationService: AuthenticationService,
+    private _sanitizer: DomSanitizer
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
       this.loading = true;
+      this.safeVideoLink = null;
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
 
       if (typeof resourceId === 'number' && isFinite(resourceId)) {
@@ -42,6 +47,9 @@ export class ResourceDetailComponent implements OnInit {
           this.initializeContactItems();
           this.loadMapLocation();
           this.loading = false;
+          if (this.resource.video_code){
+            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.resource.video_code);
+          }
         });
         if (this.currentUser && this.currentUser.role === 'Admin') {
           this.api.getResourceAdminNotes(resourceId).subscribe(notes => {

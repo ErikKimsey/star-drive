@@ -16,6 +16,7 @@ import {StudyCategory} from '../../_models/study_category';
 import {StudyInvestigator} from '../../_models/study_investigator';
 import {StepLog} from '../../_models/step_log';
 import {User} from '../../_models/user';
+import {ParticipantAdminList} from '../../_models/participant_admin_list';
 import {UserSearchResults} from '../../_models/user_search_results';
 import {StudyUser} from '../../_models/study_user';
 import {TableInfo} from '../../_models/table_info';
@@ -64,6 +65,7 @@ export class ApiService {
     organization: '/api/organization/<id>',
     organizationlist: '/api/organization',
     participant: '/api/participant/<id>',
+    participantAdminList: '/api/participant_admin_list',
     participantbysession: '/api/session/participant',
     participantStepLog: '/api/participant/step_log/<id>',
     password_requirements: '/api/password_requirements/<role>',
@@ -97,9 +99,9 @@ export class ApiService {
     studyinquiry: '/api/study_inquiry',
     studylist: '/api/study',
     user: '/api/user/<id>',
+    userAdminNoteList: '/api/user/<user_id>/admin_note',
     userEmailLog: '/api/user/email_log/<id>',
     userStudyInquiryList: '/api/user/<id>/inquiry/study',
-    userAdminNoteList: '/api/user/<user_id>/admin_note',
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
     zip_code_coords: '/api/zip_code_coords/<id>',
@@ -145,6 +147,12 @@ export class ApiService {
   /** Get Participant */
   getParticipant(id: number): Observable<Participant> {
     return this.httpClient.get<Participant>(this._endpointUrl('participant').replace('<id>', id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get User Participant Info List */
+  getParticipantAdminList(): Observable<ParticipantAdminList> {
+    return this.httpClient.get<ParticipantAdminList>(this._endpointUrl('participantAdminList'))
       .pipe(catchError(this._handleError));
   }
 
