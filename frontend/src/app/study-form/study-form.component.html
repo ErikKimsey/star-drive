@@ -6,140 +6,142 @@
     message="Loading..."
   ></app-loading>
 
-  <form [formGroup]="studyForm">
+  <div [formGroup]="studyForm">
     <h1>Study Form</h1>
     <div
       fxLayout="column"
       fxLayoutGap="1em"
     >
-    <mat-form-field>
-      <mat-label>Title</mat-label>
-      <input type="text" matInput placeholder="What is the full title of your study?" formControlName="title" required>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Title</mat-label>
+        <input type="text" matInput placeholder="What is the full title of your study?" formControlName="title" required>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Short Title</mat-label>
-      <input type="text" matInput placeholder="Short Title" formControlName="short_title" required>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Short Title</mat-label>
+        <input type="text" matInput placeholder="Short Title" formControlName="short_title" required>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Description</mat-label>
-      <input type="text" matInput placeholder="Description" formControlName="description" required>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Description</mat-label>
+        <input type="text" matInput placeholder="Description" formControlName="description" required>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Short Description</mat-label>
-      <input type="text" matInput placeholder="Short Description" formControlName="short_description" required>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Short Description</mat-label>
+        <input type="text" matInput placeholder="Short Description" formControlName="short_description" required>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Participant Description</mat-label>
-      <input type="text" matInput placeholder="Participant Description" formControlName="participant_description" required>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Participant Description</mat-label>
+        <input type="text" matInput placeholder="Participant Description" formControlName="participant_description" required>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Benefit Description</mat-label>
-      <input type="text" matInput placeholder="Benefit Description" formControlName="benefit_description" required>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Benefit Description</mat-label>
+        <input type="text" matInput placeholder="Benefit Description" formControlName="benefit_description" required>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Investigators</mat-label>
-      <mat-select multiple [formControl]="investigators">
-        <mat-option *ngFor="let investigator of investOptions" [value]="investigator">{{investigator.name}}</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Investigators</mat-label>
+        <mat-select multiple [formControl]="investigators">
+          <mat-option *ngFor="let investigator of investOptions" [value]="investigator">{{investigator.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Organization</mat-label>
-      <mat-select [formControl]="organization">
-        <mat-option>None</mat-option>
-        <mat-option *ngFor="let org of orgOptions" [value]="org">{{org.name}}</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Organization</mat-label>
+        <mat-select [formControl]="organization">
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let org of orgOptions" [value]="org">{{org.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Location</mat-label>
-      <input type="text" matInput placeholder="Location" formControlName="location">
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Location</mat-label>
+        <input type="text" matInput placeholder="Location" formControlName="location">
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Status</mat-label>
-      <mat-select [formControl]="status" required>
-        <mat-option>None</mat-option>
-        <mat-option *ngFor="let st of statusOptions" [value]="st.value">{{st.label}}</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Status</mat-label>
+        <mat-select [formControl]="status" required>
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let st of statusOptions" [value]="st.value">{{st.label}}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Email</mat-label>
-      <input type="text" matInput placeholder="Coordinator Email" formControlName="coordinator_email">
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Email</mat-label>
+        <input type="text" matInput placeholder="Coordinator Email" formControlName="coordinator_email">
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Eligibility Url</mat-label>
-      <input type="text" matInput placeholder="Eligibility Url" formControlName="eligibility_url">
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Eligibility Url</mat-label>
+        <input type="text" matInput placeholder="Eligibility Url" formControlName="eligibility_url">
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Image Url</mat-label>
-      <input type="text" matInput placeholder="Image Url" formControlName="image_url">
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Image Url</mat-label>
+        <input type="text" matInput placeholder="Image Url" formControlName="image_url">
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Topics</mat-label>
-      <input type="text" matInput placeholder="Topics" formControlName="categories">
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Topics</mat-label>
+        <mat-select multiple [formControl]="categories" [(ngModel)]="category" [compareWith]="compareObjects">
+          <mat-option *ngFor="let cat of categoryOptions" [value]="cat">{{cat.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Ages</mat-label>
-      <mat-select [formControl]="ages" multiple>
-        <mat-option *ngFor="let age of ageOptions" [value]="age.value">{{age.label}}</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Ages</mat-label>
+        <mat-select [formControl]="ages" multiple>
+          <mat-option *ngFor="let age of ageOptions" [value]="age.value">{{age.label}}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <div
-      fxLayout="row"
-      fxLayoutGap="1em"
-    >
-      <button
-        *ngIf="studyForm"
-        mat-flat-button
-        type="button"
-        (click)="submit()"
-        color="primary"
-        [disabled]="!studyForm.valid"
-        id="save-next-button"
-      >Save</button>
+      <div
+        fxLayout="row"
+        fxLayoutGap="1em"
+      >
+        <button
+          *ngIf="studyForm"
+          mat-flat-button
+          type="button"
+          (click)="submit()"
+          color="primary"
+          [disabled]="!studyForm.valid"
+          id="save-next-button"
+        >Save</button>
 
-      <button
-        *ngIf="studyForm"
-        mat-flat-button
-        type="button"
-        (click)="onCancel()"
-        color="accent"
-        id="cancel-button"
-      >Cancel</button>
+        <button
+          *ngIf="studyForm"
+          mat-flat-button
+          type="button"
+          (click)="onCancel()"
+          color="accent"
+          id="cancel-button"
+        >Cancel</button>
 
-      <button
-        type="button"
-        mat-flat-button
-        *ngIf="!showConfirmDelete && !createNew"
-        (click)="showDelete()"
-        color="warn"
-        id="delete-button"
-      >Delete</button>
+        <button
+          type="button"
+          mat-flat-button
+          *ngIf="!showConfirmDelete && !createNew"
+          (click)="showDelete()"
+          color="warn"
+          id="delete-button"
+        >Delete</button>
 
-      <button
-        *ngIf="showConfirmDelete"
-        id="confirm_delete"
-        type="button"
-        mat-flat-button
-        (click)="onDelete()"
-        color="warn"
-        id="permanently-delete-button"
-      >Permanently Delete This Study!!!
-      </button>
+        <button
+          *ngIf="showConfirmDelete"
+          id="confirm_delete"
+          type="button"
+          mat-flat-button
+          (click)="onDelete()"
+          color="warn"
+          id="permanently-delete-button"
+        >Permanently Delete This Study!!!
+        </button>
+      </div>
     </div>
   </div>
-  </form>
 </div>
