@@ -56,6 +56,7 @@ export class ApiService {
     flowquestionnaire: '/api/flow/<flow>/<questionnaire_name>',
     flowquestionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     forgot_password: '/api/forgot_password',
+    investigatorbystudy: '/api/study/<study_id>/investigator',
     investigatorlist: '/api/investigator',
     location: '/api/location/<id>',
     locationbycategory: '/api/category/<category_id>/location',
@@ -362,15 +363,9 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
-  /** Add StudyCategory */
-  addStudyCategory(studyCategory: StudyCategory): Observable<StudyCategory> {
-    return this.httpClient.post<StudyCategory>(this._endpointUrl('studycategorylist'), studyCategory)
-      .pipe(catchError(this._handleError));
-  }
-
-  /** Delete StudyCategory */
-  deleteStudyCategory(studyCategory: StudyCategory): Observable<StudyCategory> {
-    return this.httpClient.delete<StudyCategory>(this._endpointUrl('studycategory').replace('<id>', studyCategory.id.toString()))
+  /** Update StudyCategories */
+  updateStudyCategories(study_id: number, categories: StudyCategory[]): Observable<StudyCategory[]> {
+    return this.httpClient.post<StudyCategory[]>(this._endpointUrl('categorybystudy').replace('<study_id>', study_id.toString()), categories)
       .pipe(catchError(this._handleError));
   }
 
@@ -404,18 +399,11 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
-  /** Add StudyInvestigator */
-  addStudyInvestigator(studyInvestigator: StudyInvestigator): Observable<StudyInvestigator> {
-    return this.httpClient.post<StudyInvestigator>(this._endpointUrl('studyinvestigatorlist'), studyInvestigator)
+  /** Update StudyInvestigators */
+  updateStudyInvestigators(study_id: number, investigators: StudyInvestigator[]): Observable<StudyInvestigator[]> {
+    return this.httpClient.post<StudyInvestigator[]>(this._endpointUrl('investigatorbystudy').replace('<study_id>', study_id.toString()), investigators)
       .pipe(catchError(this._handleError));
   }
-
-  /** Delete StudyInvestigator */
-  deleteStudyInvestigator(studyInvestigator: StudyInvestigator): Observable<StudyInvestigator> {
-    return this.httpClient.delete<StudyInvestigator>(this._endpointUrl('studyinvestigator').replace('<id>', studyInvestigator.id.toString()))
-      .pipe(catchError(this._handleError));
-  }
-
 
   /** Get User */
   getUser(id: number): Observable<User> {
