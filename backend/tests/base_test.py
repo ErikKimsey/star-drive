@@ -119,7 +119,6 @@ class BaseTest:
                             "BAD Response: %i." % rv.status_code + ". " + msg)
 
     def construct_user(self, email="stan@staunton.com", role=Role.user):
-
         db_user = db.session.query(User).filter_by(email=email).first()
         if db_user:
             return db_user
@@ -291,9 +290,10 @@ class BaseTest:
         self.construct_location_category(location.id, cat.name)
         self.construct_study_category(study.id, cat.name)
         self.construct_zip_code()
+        user = self.construct_user()
         investigator = Investigator(name="Sam I am", organization_id=org.id)
         db.session.add(StudyInvestigator(study = study, investigator = investigator))
-        db.session.add(StudyUser(study=study, user=self.construct_user()))
+        db.session.add(StudyUser(study=study, user=user))
         db.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=''))
         db.session.add(investigator)
         db.session.add(EmailLog())

@@ -145,7 +145,7 @@ class ParentCategorySchema(ModelSchema):
     class Meta:
         model = Category
         fields = ('id', 'name', 'parent', 'level', '_links')
-    parent = fields.Nested('self', dump_only=True)
+    parent = fields.Nested(lambda: ParentCategorySchema(), dump_only=True)
     level = fields.Function(lambda obj: obj.calculate_level())
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
@@ -183,7 +183,7 @@ class CategorySchema(ModelSchema):
                   'resource_count', 'study_count', '_links')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
-    children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
+    children = fields.Nested(lambda: CategorySchema(exclude=['parent']), many=True, dump_only=True)
     parent = fields.Nested(ParentCategorySchema, dump_only=True)
     level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
     event_count = fields.Method('get_event_count', dump_only=True)

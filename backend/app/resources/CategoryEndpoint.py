@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from marshmallow import ValidationError, EXCLUDE
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
@@ -26,11 +27,13 @@ class CategoryEndpoint(flask_restful.Resource):
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Category).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors:
+        try:
+            updated = self.schema.load(request_data, session=db.session, instance=instance, unknown=EXCLUDE)
+            db.session.add(updated)
+            return self.schema.dump(updated)
+        except ValidationError as err:
+            errors = err.messages
             raise RestException(RestException.INVALID_OBJECT, details=errors)
-        db.session.add(updated)
-        return self.schema.dump(updated)
 
 
 class CategoryListEndpoint(flask_restful.Resource):
@@ -46,11 +49,14 @@ class CategoryListEndpoint(flask_restful.Resource):
 
     def post(self):
         request_data = request.get_json()
-        new_cat, errors = self.category_schema.load(request_data)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        db.session.add(new_cat)
-        db.session.commit()
-        return self.category_schema.dump(new_cat)
+        try:
+            new_cat = self.category_schema.load(request_data, unknown=EXCLUDE)
+            db.session.add(new_cat)
+            db.session.commit()
+            return self.category_schema.dump(new_cat)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
 
 
 class RootCategoryListEndpoint(flask_restful.Resource):

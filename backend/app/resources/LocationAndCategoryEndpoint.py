@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from marshmallow import ValidationError, EXCLUDE
 
 from app import db, RestException
 from app.model.category import Category
@@ -35,13 +36,17 @@ class CategoryByLocationEndpoint(flask_restful.Resource):
 
     def post(self, location_id):
         request_data = request.get_json()
-        location_categories = self.schema.load(request_data, many=True).data
-        db.session.query(ResourceCategory).filter_by(resource_id=location_id).delete()
-        for c in location_categories:
-            db.session.add(ResourceCategory(resource_id=location_id,
-                           category_id=c.category_id, type='location'))
-        db.session.commit()
-        return self.get(location_id)
+        try:
+            location_categories = self.schema.load(request_data, many=True, unknown=EXCLUDE)
+            db.session.query(ResourceCategory).filter_by(resource_id=location_id).delete()
+            for c in location_categories:
+                db.session.add(ResourceCategory(resource_id=location_id,
+                               category_id=c.category_id, type='location'))
+            db.session.commit()
+            return self.get(location_id)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
 
 
 class LocationCategoryEndpoint(flask_restful.Resource):
@@ -63,9 +68,13 @@ class LocationCategoryListEndpoint(flask_restful.Resource):
 
     def post(self):
         request_data = request.get_json()
-        load_result = self.schema.load(request_data).data
-        db.session.query(ResourceCategory).filter_by(resource_id=load_result.resource_id,
-                                                     category_id=load_result.category_id).delete()
-        db.session.add(load_result)
-        db.session.commit()
-        return self.schema.dump(load_result)
+        try:
+            load_result = self.schema.load(request_data, unknown=EXCLUDE)
+            db.session.query(ResourceCategory).filter_by(resource_id=load_result.resource_id,
+                                                         category_id=load_result.category_id).delete()
+            db.session.add(load_result)
+            db.session.commit()
+            return self.schema.dump(load_result)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)

@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from marshmallow import ValidationError, EXCLUDE
 
 from app import db, RestException, auth
 from app.model.user import User, Role
@@ -71,13 +72,17 @@ class UserByStudyEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def post(self, study_id):
         request_data = request.get_json()
-        study_users = self.schema.load(request_data, many=True).data
-        db.session.query(StudyUser).filter_by(study_id=study_id).delete()
-        for c in study_users:
-            db.session.add(StudyUser(study_id=study_id,
-                           user_id=c.user_id))
-        db.session.commit()
-        return self.get(study_id)
+        try:
+            study_users = self.schema.load(request_data, many=True, unknown=EXCLUDE)
+            db.session.query(StudyUser).filter_by(study_id=study_id).delete()
+            for c in study_users:
+                db.session.add(StudyUser(study_id=study_id,
+                               user_id=c.user_id))
+            db.session.commit()
+            return self.get(study_id)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
 
 
 class StudyUserEndpoint(flask_restful.Resource):
@@ -102,9 +107,13 @@ class StudyUserListEndpoint(flask_restful.Resource):
     @auth.login_required
     def post(self):
         request_data = request.get_json()
-        load_result = self.schema.load(request_data).data
-        db.session.query(StudyUser).filter_by(study_id=load_result.study_id,
-                                                     user_id=load_result.user_id).delete()
-        db.session.add(load_result)
-        db.session.commit()
-        return self.schema.dump(load_result)
+        try:
+            load_result = self.schema.load(request_data, unknown=EXCLUDE)
+            db.session.query(StudyUser).filter_by(study_id=load_result.study_id,
+                                                         user_id=load_result.user_id).delete()
+            db.session.add(load_result)
+            db.session.commit()
+            return self.schema.dump(load_result)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)

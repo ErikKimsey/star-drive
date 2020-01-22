@@ -2,7 +2,7 @@ import datetime
 
 import flask_restful
 from flask import request
-from marshmallow import ValidationError
+from marshmallow import ValidationError, EXCLUDE
 
 from app import RestException, db, elastic_index
 from app.model.study import Study
@@ -33,13 +33,16 @@ class StudyEndpoint(flask_restful.Resource):
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Study).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now()
-        db.session.add(updated)
-        db.session.commit()
-        elastic_index.update_document(updated, 'Study')
-        return self.schema.dump(updated)
+        try:
+            updated = self.schema.load(request_data, session=db.session, instance=instance, unknown=EXCLUDE)
+            updated.last_updated = datetime.datetime.now()
+            db.session.add(updated)
+            db.session.commit()
+            elastic_index.update_document(updated, 'Study')
+            return self.schema.dump(updated)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
 
 
 class StudyListEndpoint(flask_restful.Resource):
@@ -54,11 +57,11 @@ class StudyListEndpoint(flask_restful.Resource):
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.studySchema.load(request_data).data
+            load_result = self.studySchema.load(request_data, unknown=EXCLUDE)
             db.session.add(load_result)
             db.session.commit()
             elastic_index.add_document(load_result, 'Study')
             return self.studySchema.dump(load_result)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT,
-                                details=load_result.errors)
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)

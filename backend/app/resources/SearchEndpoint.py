@@ -1,6 +1,7 @@
 import elasticsearch
 import flask_restful
 from flask import request, json
+from marshmallow import ValidationError, EXCLUDE
 
 from app import elastic_index, RestException, db
 from app.model.category import Category
@@ -16,17 +17,18 @@ class SearchEndpoint(flask_restful.Resource):
         if 'category' in request_data and (not request_data['category'] or not request_data['category']['id']):
             del request_data['category']
 
-        search, errors = SearchSchema().load(request_data)
-
-        if errors:
-            raise RestException(RestException.INVALID_OBJECT, details=errors)
         try:
+            search = SearchSchema().load(request_data, unknown=EXCLUDE)
             # Overwrite the result types if requested.
             if not search.types and result_types:
                 search.types = result_types
-            results = elastic_index.search(search)
-        except elasticsearch.ElasticsearchException as e:
-            raise RestException(RestException.ELASTIC_ERROR, details=json.dumps(e.info))
+            try:
+                results = elastic_index.search(search)
+            except elasticsearch.TransportError as e:
+                raise RestException(RestException.ELASTIC_ERROR, details=json.dumps(e.info))
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
 
         search.reset()  # zero out any existing counts or data on the search prior to populating.
         search.total = results.hits.total

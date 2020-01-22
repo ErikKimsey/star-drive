@@ -2,6 +2,7 @@ import datetime
 
 import flask_restful
 from flask import request, g
+from marshmallow import ValidationError, EXCLUDE
 from sqlalchemy import func
 
 from app import RestException, db, auth
@@ -36,12 +37,15 @@ class ParticipantEndpoint(flask_restful.Resource):
         instance = db.session.query(Participant).filter_by(id=id).first()
         if not g.user.related_to_participant(instance.id) and not g.user.role == Role.admin:
             raise RestException(RestException.UNRELATED_PARTICIPANT)
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now()
-        db.session.add(updated)
-        db.session.commit()
-        return self.schema.dump(updated)
+        try:
+            updated = self.schema.load(request_data, session=db.session, instance=instance, unknown=EXCLUDE)
+            updated.last_updated = datetime.datetime.now()
+            db.session.add(updated)
+            db.session.commit()
+            return self.schema.dump(updated)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
 
 
 class ParticipantListEndpoint(flask_restful.Resource):

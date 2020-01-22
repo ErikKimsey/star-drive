@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from marshmallow import ValidationError, EXCLUDE
 
 from app import db, RestException
 from app.model.category import Category
@@ -35,7 +36,11 @@ class CategoryByEventEndpoint(flask_restful.Resource):
 
     def post(self, event_id):
         request_data = request.get_json()
-        event_categories = self.schema.load(request_data, many=True).data
+        try:
+            event_categories = self.schema.load(request_data, many=True, unknown=EXCLUDE)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
         db.session.query(ResourceCategory).filter_by(resource_id=event_id).delete()
         for c in event_categories:
             db.session.add(ResourceCategory(resource_id=event_id,
@@ -63,7 +68,11 @@ class EventCategoryListEndpoint(flask_restful.Resource):
 
     def post(self):
         request_data = request.get_json()
-        load_result = self.schema.load(request_data).data
+        try:
+            load_result = self.schema.load(request_data, unknown=EXCLUDE)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
         db.session.query(ResourceCategory).filter_by(resource_id=load_result.event_id,
                                                      category_id=load_result.category_id).delete()
         db.session.add(load_result)

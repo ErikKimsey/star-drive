@@ -2,6 +2,8 @@ import datetime
 import unittest
 import os
 
+from marshmallow import EXCLUDE
+
 from app.import_service import ImportService
 from app.model.data_transfer_log import DataTransferLog
 from app.model.export_info import ExportInfoSchema
@@ -104,7 +106,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
-        exports = ExportInfoSchema(many=True).load(response).data
+        exports = ExportInfoSchema(many=True).load(response, unknown=EXCLUDE)
         for export in exports:
             rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
@@ -114,7 +116,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
     def load_database(self, all_data):
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
-        exports = ExportInfoSchema(many=True).load(response).data
+        exports = ExportInfoSchema(many=True).load(response, unknown=EXCLUDE)
         importer = ImportService(app, db)
         log = importer.log_for_export(exports, datetime.datetime.now())
         for export in exports:
@@ -130,9 +132,9 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         email_verified = u.email_verified
         orig_u_date = u.last_updated
 
-        orig_user_dict = UserSchema().dump(u).data  # Use standard schema
+        orig_user_dict = UserSchema().dump(u)  # Use standard schema
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
-        orig_p_dict = ParticipantSchema().dump(p).data  # Use standard schema
+        orig_p_dict = ParticipantSchema().dump(p)  # Use standard schema
         orig_p_date = p.last_updated
         db.session.commit()
 

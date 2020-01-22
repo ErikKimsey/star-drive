@@ -1,6 +1,6 @@
 import flask_restful
 from flask import request, g
-from marshmallow import ValidationError
+from marshmallow import ValidationError, EXCLUDE
 from sqlalchemy import exc
 
 from app import db, RestException, auth
@@ -36,15 +36,15 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
         if 'user_id' not in request_data:
             request_data['user_id'] = g.user.id
         try:
-            load_result = self.schema.load(request_data).data
+            load_result = self.schema.load(request_data, unknown=EXCLUDE)
             load_result.user = db.session.query(User).filter(User.id == request_data['user_id']).first()
             load_result.relationship = relationship
             db.session.add(load_result)
             db.session.commit()
             return self.schema.dump(load_result)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT,
-                                details=load_result.errors)
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
         except exc.IntegrityError as err:
-            raise RestException(RestException.INVALID_OBJECT,
-                                details=load_result.errors)
+            errors = err.detail
+            raise RestException(RestException.INVALID_OBJECT, details=errors)

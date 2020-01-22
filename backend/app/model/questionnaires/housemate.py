@@ -135,7 +135,13 @@ class HousemateSchema(ModelSchema):
     home_self_questionnaire_id = fields.Integer(required=False, allow_none=True)
 
     def get_participant_id(self, obj):
-        return obj.supports_questionnaire.participant_id
+        if obj.home_self_questionnaire:
+            return obj.home_self_questionnaire.participant_id
+        if obj.home_dependent_questionnaire:
+            return obj.home_dependent_questionnaire.participant_id
 
     def get_user_id(self, obj):
-        return obj.supports_questionnaire.user_id
+        if obj.home_self_questionnaire:
+            return obj.home_self_questionnaire.user_id
+        if obj.home_dependent_questionnaire:
+            return obj.home_dependent_questionnaire.user_id

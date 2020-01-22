@@ -1,12 +1,14 @@
 import datetime
 import requests
+import logging
 
-# Fire of the scheduler
+# Fire off the scheduler
 # The Data Importer should run on the MIRROR, and will make calls to the primary server to download
 # data, store it locally, and remove it from the master when necessary.
-from flask import logging
+from marshmallow import ValidationError, EXCLUDE
 from sqlalchemy import desc
 
+from app import RestException
 from app.export_service import ExportService
 from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail
 from app.model.export_info import ExportInfoSchema
@@ -87,8 +89,13 @@ class ImportService:
             date_string = last_log.date_started.strftime(ExportService.DATE_FORMAT)
             url += "?after=" + date_string
         response = requests.get(url, headers=self.get_headers())
-        exportables = ExportInfoSchema(many=True).load(response.json()).data
-        return exportables
+        try:
+            exportables = ExportInfoSchema(many=True).load(response.json(), unknown=EXCLUDE)
+            return exportables
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
+
 
     def request_data(self, export_list, full_backup=False):
         for export in export_list:
@@ -124,26 +131,27 @@ class ImportService:
             if "_links" in item_copy:
                 links = item_copy.pop("_links")
             existing_model = self.db.session.query(model_class).filter_by(id=item['id']).first()
-            model, errors = schema.load(item_copy, session=self.db.session, instance=existing_model)
-            if not errors:
-                try:
-                    self.db.session.add(model)
-                    self.db.session.commit()
-                    log_detail.handle_success()
-                    self.db.session.add(log_detail)
-                    if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
-                        print("Sensitive Data.  Calling Delete.")
-                        self.delete_record(item)
-                except Exception as e:
-                    self.db.session.rollback()
-                    self.logger.error("Error processing " + export_info.class_name + " with id of " + str(
-                        item["id"]) + ".  Error: " + str(e))
-                    log_detail.handle_failure(e)
-                    self.db.session.add(log)
-                    self.db.session.add(log_detail)
-                    raise e
-            else:
+            try:
+                model = schema.load(item_copy, session=self.db.session, instance=existing_model, unknown=EXCLUDE)
+            except ValidationError as err:
+                errors = err.messages
                 e = Exception("Failed to parse model " + export_info.class_name + ". " + str(errors))
+                log_detail.handle_failure(e)
+                self.db.session.add(log)
+                self.db.session.add(log_detail)
+                raise e
+            try:
+                self.db.session.add(model)
+                self.db.session.commit()
+                log_detail.handle_success()
+                self.db.session.add(log_detail)
+                if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
+                    print("Sensitive Data.  Calling Delete.")
+                    self.delete_record(item)
+            except Exception as e:
+                self.db.session.rollback()
+                self.logger.error("Error processing " + export_info.class_name + " with id of " + str(
+                    item["id"]) + ".  Error: " + str(e))
                 log_detail.handle_failure(e)
                 self.db.session.add(log)
                 self.db.session.add(log_detail)
@@ -177,9 +185,11 @@ class ImportService:
         for json_admin in json_response:
             try:
                 password = str.encode(json_admin.pop('_password'))
-                admin, errors = schema.load(json_admin, session=self.db.session)
+                admin = schema.load(json_admin, session=self.db.session, unknown=EXCLUDE)
                 admin._password = password
                 self.db.session.add(admin)
-            except:
+            except ValidationError as err:
+                errors = err.messages
                 print("Failed to import admin user :" + json_admin['id'])
+                raise RestException(RestException.INVALID_OBJECT, details=errors)
         self.db.session.commit()

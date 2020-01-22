@@ -2,7 +2,7 @@ import datetime
 
 import flask_restful
 from flask import request, g
-from marshmallow import ValidationError
+from marshmallow import ValidationError, EXCLUDE
 
 from app import RestException, db, elastic_index, auth
 from app.model.event import Event
@@ -41,8 +41,11 @@ class EventEndpoint(flask_restful.Resource):
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Event).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+        try:
+            updated = self.schema.load(request_data, session=db.session, instance=instance, unknown=EXCLUDE)
+        except ValidationError as err:
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
         updated.last_updated = datetime.datetime.now()
         db.session.add(updated)
         db.session.commit()
@@ -71,15 +74,15 @@ class EventListEndpoint(flask_restful.Resource):
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.eventSchema.load(request_data).data
+            load_result = self.eventSchema.load(request_data, unknown=EXCLUDE)
             db.session.add(load_result)
             db.session.commit()
             elastic_index.add_document(load_result, 'Event', latitude=load_result.latitude, longitude=load_result.longitude)
             self.log_update(event_id=load_result.id, event_title=load_result.title, change_type='create')
             return self.eventSchema.dump(load_result)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT,
-                                details=load_result.errors)
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
 
     def log_update(self, event_id, event_title, change_type):
         log = ResourceChangeLog(resource_id=event_id, resource_title=event_title, user_id=g.user.id,

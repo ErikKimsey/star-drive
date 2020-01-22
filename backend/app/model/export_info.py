@@ -36,7 +36,7 @@ class ExportInfoSchema(Schema):
         ordered = True
         fields = ["table_name", "class_name", "display_name", "size", "url", "question_type", "sub_tables"]
 
-    sub_tables = fields.Nested("self", default=None, many=True, dump_only=True)
+    sub_tables = fields.Nested(lambda: ExportInfoSchema(), default=None, many=True, dump_only=True)
     display_name = fields.String(dump_only=True)
 
     @post_load

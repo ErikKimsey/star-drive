@@ -1,6 +1,6 @@
 import flask_restful
 from flask import request
-from marshmallow import ValidationError
+from marshmallow import ValidationError, EXCLUDE
 from app import db, auth, RestException
 from app.model.admin_note import AdminNote
 from app.schema.schema import AdminNoteSchema
@@ -32,12 +32,17 @@ class AdminNoteEndpoint(flask_restful.Resource):
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(AdminNote).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now()
-        db.session.add(updated)
-        db.session.commit()
-        return self.schema.dump(updated)
+        try:
+            # Remove dump_only fields
+            db_note = self.schema.load(request_data, session=db.session, instance=instance, unknown=EXCLUDE)
+            db_note.last_updated = datetime.datetime.now()
+            db.session.add(db_note)
+            db.session.commit()
+            return self.schema.dump(db_note)
+        except ValidationError as err:
+            print(err)
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
 
 
 class AdminNoteListEndpoint(flask_restful.Resource):
@@ -56,14 +61,13 @@ class AdminNoteListEndpoint(flask_restful.Resource):
     def post(self):
         request_data = request.get_json()
         try:
-            new_note, errors = self.adminNoteSchema.load(request_data)
-            if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+            new_note = self.adminNoteSchema.load(request_data, unknown=EXCLUDE)
             db.session.add(new_note)
             db.session.commit()
             return self.adminNoteSchema.dump(new_note)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT,
-                                details=new_note.errors)
+            errors = err.messages
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
 
 
 class AdminNoteListByUserEndpoint(flask_restful.Resource):

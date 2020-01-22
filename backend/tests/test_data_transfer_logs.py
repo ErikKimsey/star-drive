@@ -1,6 +1,7 @@
 import unittest
 
 from flask import json
+from marshmallow import EXCLUDE
 
 from app import db
 from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail, DataTransferLogSchema
@@ -26,5 +27,5 @@ class TestDataTransferLogs(BaseTest, unittest.TestCase):
         self.assertEquals(20, response['total'])
         self.assertEquals(2, response['pages'])
         self.assertEquals(10, len(response['items']))
-        results = DataTransferLogSchema(many=True, session=db.session).load(response['items']).data
+        results = DataTransferLogSchema(many=True, session=db.session).load(response['items'], unknown=EXCLUDE)
         self.assertEquals(10, len(results))
