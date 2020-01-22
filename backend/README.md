@@ -39,12 +39,12 @@ npm install -g @angular/cli
 ```
 
 ### Project Setup
-* Please use Python 3's virtual environment setup, and install the dependencies in requirements.txt
+* Please use Python 3's virtual environment setup, and install the dependencies via Pipenv
 ```bash
 cd backend
-python3 -m venv python-env
-source python-env/bin/activate
-pip3 install -r requirements.txt
+export FLASK_APP=./app/__init__.py
+pip install pipenv
+pipenv install
 ```
 
 ## Database Setup
@@ -173,8 +173,8 @@ TESTING = False
 ### Clear out the database, indexes, and reseed the database
 This will remove all data from the database, delete all information from the ElasticSearch Index, and remove all data and recreate it from the example data files. In the `backend` directory, execute the following command:
 ```BASH
-source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
+pipenv install
 flask cleardb
 flask db upgrade
 flask initdb
@@ -321,4 +321,3 @@ When pushing to production please create a new 'Release' on gitHub describing th
 
 
 
- 
