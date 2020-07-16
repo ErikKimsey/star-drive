@@ -33,22 +33,42 @@
           Profile Complete
         </div>
         <div
-          fxLayout="row"
-          fxLayout.xs="column"
-          fxLayoutAlign="start center"
-          fxLayoutGap="10px"
+          fxLayout="column"
+          fxLayoutGap="2em"
         >
-          <button
-            mat-flat-button
-            color="accent"
-            (click)="goEditEnroll($event)"
-            id="edit_enroll_{{participant.relationship}}_{{participant.id}}"
-          >Edit {{participant.relationship === 'self_guardian' ? 'guardian'  : 'enrollment'}} info</button>
-          <button
-            mat-stroked-button
-            (click)="goTerms($event)"
-            id="view_terms_{{participant.relationship}}_{{participant.id}}"
-          >Terms and Conditions</button>
+          <div
+            fxLayout="row"
+            fxLayout.xs="column"
+            fxLayoutAlign="start center"
+            fxLayoutGap="10px"
+          >
+            <button
+              mat-flat-button
+              color="accent"
+              (click)="goEditEnroll($event)"
+              id="edit_enroll_{{participant.relationship}}_{{participant.id}}"
+            >Edit {{participant.relationship === 'self_guardian' ? 'guardian'  : 'enrollment'}} info</button>
+            <button
+              mat-stroked-button
+              (click)="goTerms($event)"
+              id="view_terms_{{participant.relationship}}_{{participant.id}}"
+            >Terms and Conditions</button>
+          </div>
+
+          <div
+            fxLayout="column"
+            fxLayoutAlign="center center"
+            fxLayoutGap="1em"
+          >
+            <hr>
+            <button
+              id="skill-star-button"
+              mat-flat-button
+              [routerLink]="[ '/skillstar/menu' ]"
+              [disabled]="participant.percent_complete < 1"
+              color="primary"
+            >Start SkillSTAR</button>
+          </div>
         </div>
       </mat-card-subtitle>
     </mat-card-header>

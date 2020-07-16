@@ -26,6 +26,7 @@ import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
 import {UvaEducationComponent} from '../uva-education/uva-education.component';
 import {Covid19ResourcesComponent} from '../covid19-resources/covid19-resources.component';
+import {SkillStarMenuComponent} from "../skillstar-menu/skillstar-menu.component";
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
@@ -107,6 +108,12 @@ const routes: Routes = [
   {path: 'timedout', component: TimedoutComponent, data: {title: 'Your session has timed out.', hideHeader: true}},
   {path: 'search', component: SearchComponent, data: {title: 'Search Autism DRIVE'}},
   {path: 'search/:query', component: SearchComponent, data: {title: 'Search Autism DRIVE Resources'}},
+  {
+    path: 'skillstar/menu',
+    component: SkillStarMenuComponent,
+    data: {title: 'SkillSTAR Skills menu'},
+    canActivate: [AuthGuard, NotMirroredGuard]
+  },
   {
     path: 'admin',
     component: AdminHomeComponent,
