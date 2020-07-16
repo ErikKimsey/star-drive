@@ -208,7 +208,7 @@ class IdentificationQuestionnaire(db.Model):
     )
 
     def get_name(self):
-        if not self.is_first_name_preferred:
+        if self.nickname and not self.is_first_name_preferred:
             return self.nickname
         else:
             return self.first_name
