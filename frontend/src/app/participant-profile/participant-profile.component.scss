@@ -4,10 +4,6 @@
   width: 100%;
 }
 
-mat-card-header {
-  position: relative;
-}
-
 [mat-card-avatar] {
   width: 100px;
   height: 100px;
@@ -15,17 +11,6 @@ mat-card-header {
 }
 
 [mat-card-avatar]:hover {
-  opacity: .5;
-}
-
-.change_text {
-  position: absolute;
-  top: 105px;
-  left: 7px;
-  cursor: pointer;
-}
-
-.change_text:hover {
   opacity: .5;
 }
 
