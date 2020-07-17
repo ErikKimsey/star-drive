@@ -61,6 +61,12 @@
             fxLayoutGap="1em"
           >
             <hr>
+            <p *ngIf="participant.percent_complete < 1">
+              In order to start training with SkillSTAR, please complete your DRIVE profile
+            </p>
+            <p *ngIf="participant.percent_complete >= 1">
+              Start SkillSTAR to get expert-guided training in self-care and health related skills
+            </p>
             <button
               id="skill-star-button"
               mat-flat-button
