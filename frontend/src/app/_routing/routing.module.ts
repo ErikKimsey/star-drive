@@ -27,6 +27,7 @@ import {NotMirroredGuard} from './not-mirrored-guard';
 import {UvaEducationComponent} from '../uva-education/uva-education.component';
 import {Covid19ResourcesComponent} from '../covid19-resources/covid19-resources.component';
 import {SkillStarMenuComponent} from "../skillstar-menu/skillstar-menu.component";
+import {SkillstarHomeComponent} from "../skillstar-home/skillstar-home.component";
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
@@ -111,7 +112,13 @@ const routes: Routes = [
   {
     path: 'skillstar/menu',
     component: SkillStarMenuComponent,
-    data: {title: 'SkillSTAR Skills menu'},
+    data: {title: 'SkillSTAR Skills menu', hideHeader: true},
+    canActivate: [AuthGuard, NotMirroredGuard]
+  },
+  {
+    path: 'skillstar/home',
+    component: SkillstarHomeComponent,
+    data: {title: 'SkillSTAR Dashboard', hideHeader: true},
     canActivate: [AuthGuard, NotMirroredGuard]
   },
   {

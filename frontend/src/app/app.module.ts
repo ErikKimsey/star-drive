@@ -144,6 +144,8 @@ import { InvestigatorFormComponent } from './investigator-form/investigator-form
 import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-entry.component';
 import { EmailLogAdminComponent } from './email-log-admin/email-log-admin.component';
 import { SkillStarMenuComponent } from './skillstar-menu/skillstar-menu.component';
+import { SkillstarHomeComponent } from './skillstar-home/skillstar-home.component';
+import { SkillstarHeaderComponent } from './skillstar-header/skillstar-header.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -297,6 +299,8 @@ export class FormlyConfig {
     StudySurveyEntryComponent,
     EmailLogAdminComponent,
     SkillStarMenuComponent,
+    SkillstarHomeComponent,
+    SkillstarHeaderComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
