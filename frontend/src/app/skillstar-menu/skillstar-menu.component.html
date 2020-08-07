@@ -1,1 +1,43 @@
-<p>skill-star-menu works!</p>
+<app-skillstar-header [participant]="participant"></app-skillstar-header>
+<div class="skillstar-menu">
+  <h1>Skills</h1>
+  <div fxLayout="row" fxLayoutGap="2em">
+    <mat-card fxFlex="30%">
+      <mat-card-title>Brushing Teeth Scorecard</mat-card-title>
+      <mat-card-content>
+            <button
+              id="skill-star-button"
+              mat-flat-button
+              [routerLink]="[ '/skillstar/home/' + participant.id ]"
+              color="primary"
+            >Start Brushing Teeth</button>
+      </mat-card-content>
+    </mat-card>
+    <mat-card fxFlex="30%">
+      <mat-card-title>Coming Soon: Washing Hands</mat-card-title>
+      <mat-card-content>
+        We are working hard to develop expert-guided skill trainings, and hand washing is next on our
+        list. If you would like to receive an email when this training is ready, please click the button below
+        <button
+          mat-flat-button
+          color="primary"
+        >Notify Me</button>
+      </mat-card-content>
+    </mat-card>
+    <mat-card fxFlex="30%">
+      <mat-card-title>Additional Skills</mat-card-title>
+      <mat-card-content>
+        Tell us what skills you would like us to work on next
+        <div fxLayout="column">
+          <mat-checkbox>Menstrual Care</mat-checkbox>
+          <mat-checkbox>Self Breast Exam</mat-checkbox>
+          <mat-checkbox>Other</mat-checkbox>
+        </div>
+        <button
+          mat-flat-button
+          color="primary"
+        >Submit</button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

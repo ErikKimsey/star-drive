@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {Participant} from '../_models/participant';
 
 @Component({
   selector: 'app-skillstar-header',
@@ -6,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./skillstar-header.component.scss']
 })
 export class SkillstarHeaderComponent implements OnInit {
+  @Input() participant: Participant;
 
   constructor() { }
 

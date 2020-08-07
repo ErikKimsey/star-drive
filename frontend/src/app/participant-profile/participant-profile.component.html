@@ -70,7 +70,7 @@
             <button
               id="skill-star-button"
               mat-flat-button
-              [routerLink]="[ '/skillstar/menu' ]"
+              [routerLink]="[ '/skillstar/menu/' + participant.id ]"
               [disabled]="participant.percent_complete < 1"
               color="primary"
             >Start SkillSTAR</button>

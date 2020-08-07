@@ -26,8 +26,8 @@ import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
 import {UvaEducationComponent} from '../uva-education/uva-education.component';
 import {Covid19ResourcesComponent} from '../covid19-resources/covid19-resources.component';
-import {SkillStarMenuComponent} from "../skillstar-menu/skillstar-menu.component";
-import {SkillstarHomeComponent} from "../skillstar-home/skillstar-home.component";
+import {SkillStarMenuComponent} from '../skillstar-menu/skillstar-menu.component';
+import {SkillstarHomeComponent} from '../skillstar-home/skillstar-home.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
@@ -67,7 +67,7 @@ const routes: Routes = [
     data: {title: 'Your Autism DRIVE Account'},
     canActivate: [AuthGuard, NotMirroredGuard]
   },
-  {path: 'register', component: RegisterComponent, data: {title: 'Create an Autism DRIVE Account', hideHeader: true}},
+  {path: 'register', component: RegisterComponent, data: {title: 'Create an Autism DRIVE Account'}},
   {path: 'event/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Event Details'}},
   {path: 'location/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Location Details'}},
   {path: 'resource/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Resource Details'}},
@@ -110,13 +110,13 @@ const routes: Routes = [
   {path: 'search', component: SearchComponent, data: {title: 'Search Autism DRIVE'}},
   {path: 'search/:query', component: SearchComponent, data: {title: 'Search Autism DRIVE Resources'}},
   {
-    path: 'skillstar/menu',
+    path: 'skillstar/menu/:participantId',
     component: SkillStarMenuComponent,
     data: {title: 'SkillSTAR Skills menu', hideHeader: true},
     canActivate: [AuthGuard, NotMirroredGuard]
   },
   {
-    path: 'skillstar/home',
+    path: 'skillstar/home/:participantId',
     component: SkillstarHomeComponent,
     data: {title: 'SkillSTAR Dashboard', hideHeader: true},
     canActivate: [AuthGuard, NotMirroredGuard]
